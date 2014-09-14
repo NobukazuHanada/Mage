@@ -5,7 +5,7 @@ Haxe MVW Frontend Framework
 
 
 
-** sample/SampleView.hx **
+**sample/SampleView.hx**
 
 ```haxe
 package ;
@@ -22,7 +22,7 @@ class SampleView{}
 
 ```
 
-** sample/Main.hx **
+**sample/Main.hx**
 
 ```haxe
 package ;
