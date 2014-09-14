@@ -3,6 +3,7 @@
   "url" :
       "https://github.com/NobukazuHanada/Mage",
   "license": "MIT",
+  "classPath": "src/",
   "tags": ["web", "js"],
   "description":
       "This is MVW Frontend Framework as Haxe!",
