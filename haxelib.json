@@ -2,7 +2,7 @@
   "name": "Mage",
   "url" :
       "https://github.com/NobukazuHanada/Mage",
-  "license": "Apache License",
+  "license": "MIT",
   "tags": ["web", "js"],
   "description":
       "This is MVW Frontend Framework as Haxe!",
