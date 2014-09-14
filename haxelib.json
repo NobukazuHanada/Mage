@@ -1,0 +1,17 @@
+{
+  "name": "Mage",
+  "url" :
+      "https://github.com/NobukazuHanada/Mage",
+  "license": "Apache License",
+  "tags": ["web", "js"],
+  "description":
+      "This is MVW Frontend Framework as Haxe!",
+  "version": "0.0.1",
+  "releasenote":
+      "Initial release",
+  "contributors": ["nobkz"],
+  "dependencies": {
+    "htmlparser": "",
+    "buddy" : ""
+  }
+}
