@@ -59,7 +59,7 @@ class Main{
 }
 ```
 
-**build.hxml
+**build.hxml**
 
 ```
 -cp sample
