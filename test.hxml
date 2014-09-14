@@ -1,0 +1,6 @@
+-lib buddy
+-lib htmlparser
+-main TestCompileHTML
+-cp src
+-cp test
+-js main.js
