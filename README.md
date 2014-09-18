@@ -3,7 +3,22 @@ Mage
 
 Haxe MVW Frontend Framework
 
+## Install
 
+install this command
+
+```
+haxelib install Mage
+```
+
+add build.hxml
+
+```
+-lib Mage
+```
+
+
+## Example
 
 **sample/SampleView.hx**
 
@@ -42,4 +57,30 @@ class Main{
 		});
 	}
 }
+```
+
+**build.hxml**
+
+```
+-cp sample
+-lib Mage
+-js main.js
+-main Main
+```
+
+**index.html**
+
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>test</title>
+  <script src="main.js"></script>
+</head>
+<body>
+
+</body>
+</html>
 ```
