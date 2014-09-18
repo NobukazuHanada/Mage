@@ -39,7 +39,7 @@ class TestCompileHTML extends BuddySuite implements Buddy {
 
       	it("input binding text",{
       		var inputDom  = new InputBindingView();
-      		var input : js.html.Element =cast inputDom.input;
+      		var input  = inputDom.input;
 
       		var expectedDom = js.Browser.document.createElement("input");
       		expectedDom.setAttribute("type","text");

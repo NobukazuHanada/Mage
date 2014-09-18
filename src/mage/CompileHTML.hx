@@ -41,6 +41,87 @@ class CompileHTML{
 			}else [macro js.Browser.document.createTextNode($v{text})];
 		}
 
+		function elementNameToType(s:String)
+			return switch (s) {
+				case "a": macro : js.html.AnchorElement;
+				case "applet" : macro : js.html.AppletElement;
+				case "area" : macro : js.html.AreaElement;
+				case "br" : macro : js.html.BRElement;
+				case "base" : macro : js.html.BaseElement;
+				case "basefont" : macro : js.html.BaseFontElement;
+				case "body" : macro : js.html.BodyElement;
+				case "button" : macro : js.html.ButtonElement;
+				case "canvas" : macro : js.html.CanvasElement;
+				case "content" : macro : js.html.ContentElement;
+				case "dl" : macro : js.html.DListElement;
+				case "datalist" : macro : js.html.DataListElement;
+				case "details" : macro : js.html.DetailsElement;
+				case "dir" : macro : js.html.DirectoryElement;
+				case "div" : macro : js.html.DivElement;
+				case "embed" : macro : js.html.EmbedElement;
+				case "fieldset" : macro : js.html.FieldSetElement;
+				case "font" : macro : js.html.FontElement;
+				case "frame" : macro : js.html.FrameElement;
+				case "frameset" : macro : js.html.FrameSetElement;
+				case "hr" : macro : js.html.HRElement;
+				case "head" : macro : js.html.HeadElement;
+				case "h1" : macro : js.html.HeadingElement;
+				case "h2" : macro : js.html.HeadingElement;
+				case "h3" : macro : js.html.HeadingElement;
+				case "h4" : macro : js.html.HeadingElement;
+				case "h5" : macro : js.html.HeadingElement;
+				case "h6" : macro : js.html.HeadingElement;
+				case "html" : macro : js.html.HtmlElement;
+				case "iframe" : macro : js.html.IFrameElement;
+				case "img" : macro : js.html.ImageElement;
+				case "input" : macro : js.html.InputElement;
+				case "keygen" : macro : js.html.KeygenElement;
+				case "li" : macro : js.html.LIElement;
+				case "label" : macro : js.html.LabelElement;
+				case "legend" : macro : js.html.LegendElement;
+				case "link" : macro : js.html.LinkElement;
+				case "map" : macro : js.html.MapElement;
+				case "marquee" : macro : js.html.MarqueeElement;
+				case "audio" : macro : js.html.MediaElement;
+				case "video" : macro : js.html.MediaElement;
+				case "menu" : macro : js.html.MenuElement;
+				case "meta" : macro : js.html.MetaElement;
+				case "meter" : macro : js.html.MeterElement;
+				case "del" : macro : js.html.ModElement;
+				case "ins" : macro : js.html.ModElement;
+				case "ol" : macro : js.html.OListElement;
+				case "object" : macro : js.html.ObjectElement;
+				case "optgroup" : macro : js.html.OptGroupElement;
+				case "option" : macro : js.html.OptionElement;
+				case "output" : macro : js.html.OutputElement;
+				case "p" : macro : js.html.ParagraphElement;
+				case "param" : macro : js.html.ParamElement;
+				case "pre" : macro : js.html.PreElement;
+				case "progress" : macro : js.html.ProgressElement;
+				case "q" : macro : js.html.QuoteElement;
+				case "script" : macro : js.html.ScriptElement;
+				case "select" : macro : js.html.SelectElement;
+				case "shadow" : macro : js.html.ShadowElement;
+				case "source" : macro : js.html.SourceElement;
+				case "span" : macro : js.html.SpanElement;
+				case "style" : macro : js.html.StyleElement;
+				case "table" : macro : js.html.TableElement;
+				case "tbody" : macro : js.html.TableSectionElement;
+				case "thead" : macro : js.html.TableSectionElement;
+				case "tfoot" : macro : js.html.TableSectionElement;
+				case "td" : macro : js.html.TableCellElement;
+				case "col" : macro : js.html.TableColElement;
+				case "colgroup" : macro : js.html.TableColElement;
+				case "tr" : macro : js.html.TableRowElement;
+				case "caption" : macro : js.html.TableCaptionElement;
+				case "textarea" : macro : js.html.TextAreaElement;
+				case "title" : macro : js.html.TitleElement;
+				case "track" : macro : js.html.TrackElement;
+				case "ul" : macro : js.html.UListElement;
+				case _ : macro : js.html.Element;
+			};
+		
+
 		function compileNode(node:HtmlNode){
 			if(node.getClass().getClassName() == "htmlparser.HtmlNodeText"){
 				var nodeText : HtmlNodeText = cast node;
@@ -49,11 +130,12 @@ class CompileHTML{
 			}else{
 				var nodeElement : HtmlNodeElement = cast node;
 				var name =  nodeElement.name;
-				var domNameExpr = macro var element = js.Browser.document.createElement($v{name});
+				var typeDom = elementNameToType(name);
+				var domNameExpr = macro var element : $typeDom =cast js.Browser.document.createElement($v{name});
 				var attributes = nodeElement.attributes;
 				var attrExprs = attributes.map(function(a){
 					return if(a.name == "mage-var"){
-							mageVars.push(a.value);
+							mageVars.push({name : a.value, type : typeDom});
 							var value = a.value;
 							macro this.$value = element;
 						}else{
@@ -83,7 +165,7 @@ class CompileHTML{
 			args : vars.map(function(name) : FunctionArg return { name : name, value : null, type : null, opt : null })
 		}
 
-		var varsField = vars.concat(mageVars).map(function(v) return {
+		var varsField = vars.map(function(v) return {
 				name : v,
 				doc : null,
 				meta : [],
@@ -92,6 +174,16 @@ class CompileHTML{
 				pos : Context.currentPos()
 			});
 		fields = fields.concat(varsField);
+
+		var mageVarsField = mageVars.map(function(v) return {
+				name : v.name,
+				doc : null,
+				meta : [],
+				access : [APublic],
+				kind : FVar(v.type),
+				pos : Context.currentPos()
+			});
+		fields = fields.concat(mageVarsField);
 
 		var nodeField = {
 			name : "nodes",
