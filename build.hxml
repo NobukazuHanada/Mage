@@ -1,5 +1,7 @@
--cp sample
--cp src
--js main.js
+-lib buddy
 -lib htmlparser
--main Main
+-lib simpleMonad
+-main TestCompileHTML
+-cp src
+-cp test
+-js main.js
