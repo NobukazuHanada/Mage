@@ -51,7 +51,7 @@ class Main{
 			js.Browser.document.body.appendChild(sampleView.nodes[0]);
 
 			sampleView.input.addEventListener("change",function(e){
-				sampleView.message.nodeValue = ((cast sampleView.input) : InputElement).value;
+				sampleView.message.nodeValue = sampleView.input.value;
 			});
 
 		});
