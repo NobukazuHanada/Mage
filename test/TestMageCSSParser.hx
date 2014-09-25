@@ -1,5 +1,6 @@
 package ;
 
+import mage.MageCSS;
 import mage.MageCSSParser;
 import mage.MageCSSParser.Input;
 
@@ -14,20 +15,22 @@ class TestMageCSSParser extends BuddySuite implements Buddy {
     describe("Mage CSS Parser", {
       it("success to parse css",{
 
-        var result = MageCSSParser.cssElement(new Input(
-"div {
+        var result = MageCSSParser.parser(
+"
+package sample.package;
+
+div {
   top : 10px;
-  bottom : 10px;
-} "
-          ));
+}
+");
 
         switch (result) {
           case Success(ParseItem(p,_)):
-            p.string().should.be(
-              { selector : "div",  
-                block : [{ property : "top" ,  value : "10px" },
-                         { property : "bottom" ,  value : "10px" }] }.string() );
-          case _:
+            p.cssPackage.should.be("sample.package");
+            p.css[0].selector.string().should.be(SElement(STag("div")).string());
+            p.css[0].blocks[0].string().should.be({ property : "top", value : "10px" }.string());
+          case error:
+            trace(error);
             false.should.be(true);
         }
          

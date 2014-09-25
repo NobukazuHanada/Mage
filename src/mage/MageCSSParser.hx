@@ -1,39 +1,13 @@
 package mage;
 
+
+import mage.MageCSS;
 import simple.Monad;
 import simple.monads.Option;
 using simple.monads.Parser;
 using StringTools;
 using Lambda;
 using Std;
-
-
-typedef MageCSS = Array<MageCSSElement>;
-
-typedef MageCSSElement = 
-{
-	selector : Selector,
-	blocks : Array<Block>
-}
-
-enum Selector{
-	SElement(e:SelectorElement);
-	SChild(parent:SelectorElement,child:Selector);
-	SDecendant(parent:SelectorElement,desendant:Selector);
-}
-
-enum SelectorElement{
-	SID(name:String);
-	SClass(name:String);
-	STag(name:String);
-	SAttr(name:String,value:String);
-}
-
-typedef Block = {
-	property : String,
-	value : String
-}
-
 
 class Input{
     public var inputData(default, null) : String;
@@ -102,18 +76,42 @@ class MageCSSParser{
                 mPack(x + xs);
             }).or(failure("expected " + s));
 
-    public static function isAlpabet(c:String)
+    public static function isAlphabet(c:String)
         return "ABCDEFGHIJKLNMOPQRSTUVWXYZabcdefghijklnmopqrstuvwxyz".split("").map(function(x) return x == c ).fold(function(x,acc) return acc || x, false);
 
     public static function isNumber(c:String)
         return "0123456789".split("").map(function(x) return x == c ).fold(function(x,acc) return acc || x, false);
 
+    public static var alphabet = sat(isAlphabet);
+    public static var number = sat(isNumber);
+
     // end
 
-    public static var selector = Monad.do_m(Parser,{
-    	s < nonchar(" ").many1();
-    	mPack(s.join(""));
-    	});
+    public static var name = Monad.do_m(Parser,{
+        s < alphabet;
+        ss < (alphabet.or(number).or(char("_")).or(char("-"))).many();
+        mPack([s].concat(ss).join(""));
+        });
+
+    public static var sid = Monad.do_m(Parser,{
+        char("#");
+        n < name;
+        mPack(SElement(SID(n)));
+        });
+
+    public static var sclass = Monad.do_m(Parser,{
+        char(".");
+        n < name;
+        mPack(SElement(SClass(n)));
+        });
+
+    public static var stag = Monad.do_m(Parser,{
+        n < name;
+        mPack(SElement(STag(n)));
+        });
+
+
+    public static var selector : ParserC<Selector> = sid.or(sclass).or(stag);
 
     public static var property =   Monad.do_m(Parser,{
     	s < nonchar(":").and(nonchar(" ")).many1();
@@ -141,7 +139,7 @@ class MageCSSParser{
     public static var blocks = block.many();
 
 
-    public static var cssElement = Monad.do_m(Parser,{
+    public static var cssElement : ParserC<MageCSSElement> = Monad.do_m(Parser,{
     	s < selector;
     	spaces;
     	char("{");
@@ -150,14 +148,27 @@ class MageCSSParser{
     	spaces;
     	char("}");
     	spaces;
-    	mPack({selector:s,block:bs});
+    	mPack({selector:s,blocks:bs});
     	});
 
+    public static var csspackage = Monad.do_m(Parser,{
+        spaces;
+        string("package");
+        spaces1;
+        p < (alphabet.or(number).or(char(".")).or(char("-")).or(char("_"))).many();
+        char(";");
+        mPack(p.join(""));
+        });
 
     public static var css = Monad.do_m(Parser,{
+        csspack < csspackage;
+        spaces;
     	css < cssElement.many();
+        spaces;
     	eof;
-    	mPack(css);
+    	mPack({cssPackage:csspack,css:css});
     	});
+
+    public static function parser(csstext:String)  return css(new Input(csstext));
 
 }
