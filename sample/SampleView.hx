@@ -2,6 +2,22 @@ package ;
 
 import mage.CompileHTML;
 
+@:build(mage.CompileHTML.generate(
+'package sample.base;
+
+<html lang="ja">
+<head>
+	<meta charset="UTF-8">
+	<link rel="stylesheet" type="text/css" href="mage.css">
+	<title>Mage Sample</title>
+</head>
+<body>
+	<div mage-var="component"></div>	
+</body>
+</html>'
+))
+class BaseView{}
+
 @:build(mage.CompileCSS.generate(
 'package sample.view;
 
