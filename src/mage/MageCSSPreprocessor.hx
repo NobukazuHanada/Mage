@@ -1,8 +1,7 @@
 package mage;
 
-import mage.MageCSS;
-
 using Lambda;
+using mage.MageCSS;
 
 class MageCSSPreprocessor{
 	
@@ -10,13 +9,7 @@ class MageCSSPreprocessor{
 		var cssPackage = mageCSS.cssPackage.split(".").join("-");
 
 		return mageCSS.css.map(function(cssElement){
-			var mageSelector = switch(cssElement.selector){
-				case SElement(SClass(name)): name + "." + cssPackage;
-				case SElement(SID(name)): name + "." + cssPackage;
-				case SElement(STag(name)): name + "." + cssPackage;
-				case _:
-					"";
-			}
+			var mageSelector = cssSelectorAddPackage(cssPackage,cssElement.selector);
 			return mageSelector + "{" +
 				cssElement.blocks
 				.map(function(block)return block.property + ":" + block.value + ";" )
@@ -24,4 +17,14 @@ class MageCSSPreprocessor{
 			+"}";
 		}).fold(function(selectorText,acc) return acc + selectorText, "");
 	}
+
+	private static function cssSelectorAddPackage(cssPackage,selector)
+		return switch(selector){
+				case SElement(element): element.toString() + "." + cssPackage;
+				case SDescendant(parent,descendant):
+					cssSelectorAddPackage(cssPackage,parent) + " " + cssSelectorAddPackage(cssPackage,descendant);
+				case SChild(parent,descendant):
+					cssSelectorAddPackage(cssPackage,parent) + " > " + cssSelectorAddPackage(cssPackage,descendant);
+			};
+	
 }

@@ -29,3 +29,14 @@ typedef Block = {
 	property : String,
 	value : String
 }
+
+class SelectorElementTools {
+	public static function toString(s:SelectorElement)
+		return switch (s) {
+			case SID(name): "#" + name;
+			case SClass(name): "." + name;
+			case SAttr(code): code;
+			case STag(name): name;
+			case SConnect(element,classes): toString(element) + "." + classes.join("."); 
+		}
+}
