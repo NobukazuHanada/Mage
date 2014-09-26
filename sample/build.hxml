@@ -1,0 +1,4 @@
+-cp ../src
+-lib HtmlParser
+-main Main
+-js main.js

@@ -1,7 +1,0 @@
--lib buddy
--lib htmlparser
--lib simpleMonad
--main TestCompileHTML
--cp src
--cp test
--js main.js
