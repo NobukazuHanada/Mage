@@ -1,9 +1,20 @@
 package mage;
 
+import simple.monads.Result;
+import simple.monads.Parser;
+
 using Lambda;
 using mage.MageCSS;
 
 class MageCSSPreprocessor{
+	public static function proprocess(inputText:String) : String {
+		var result = MageCSSParser.parser(inputText);
+		return switch (result) {
+			case Success(ParseItem(p,_)): evalMageCSS(p);
+			case Error(e): throw "css parse error : " + e.msg; 
+		}
+	}
+
 	
 	public static function evalMageCSS(mageCSS:MageCSS) : String {
 		var cssPackage = mageCSS.cssPackage.split(".").join("-");

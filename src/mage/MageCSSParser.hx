@@ -1,6 +1,8 @@
 package mage;
 
 
+import haxe.macro.Expr;
+
 import mage.MageCSS;
 import simple.Monad;
 import simple.monads.Option;
@@ -33,7 +35,24 @@ class Input{
 typedef ParseError = { line : Int, pos : Int, msg : String };
 typedef ParserC<T> = ParserDef<Input,ParseError,T>
 
+
 class MageCSSParser{
+    macro public static function or(e:Array<Expr>) : Expr{
+        e.reverse();
+        var first = e.shift();
+        var rest = e;
+        return rest.fold(function(expr,acc) 
+            return macro Parser.or(${expr},${acc}),first);
+    } 
+
+    macro public static function many(e){
+        return macro Parser.many($e);
+    }
+
+    macro public static function many1(e){
+        return macro Parser.many1($e);
+    }
+
 	// to library?, begin
     public static function err<T>(msg, input) : ParseResult<Input,ParseError,T> return Error({ msg : msg, pos : input.pos, line : input.line});
 
@@ -59,8 +78,8 @@ class MageCSSParser{
             });
 
     public static var space = sat(function(s)return s.isSpace(0) );
-    public static var spaces = space.many();
-    public static var spaces1 = space.many1();
+    public static var spaces  = many(space);
+    public static var spaces1 = many1(space);
 
     public static function char(c:String)
         return sat(function(i) return i == c );
@@ -70,11 +89,13 @@ class MageCSSParser{
 
     public static function string(s:String)
         return if( s.length == 0 ) Parser.mPack("")
-        else Monad.do_m(Parser,{
+        else or(
+            Monad.do_m(Parser,{
                 x < char(s.charAt(0));
                 xs < string(s.substring(1));
                 mPack(x + xs);
-            }).or(failure("expected " + s));
+            }),
+            failure("expected " + s));
 
     public static function isAlphabet(c:String)
         return "ABCDEFGHIJKLNMOPQRSTUVWXYZabcdefghijklnmopqrstuvwxyz".split("").map(function(x) return x == c ).fold(function(x,acc) return acc || x, false);
@@ -89,7 +110,7 @@ class MageCSSParser{
 
     public static var name = Monad.do_m(Parser,{
         s < alphabet;
-        ss < (alphabet.or(number).or(char("_")).or(char("-"))).many();
+        ss <  many(or(alphabet,number,char("_"),char("-")));
         mPack([s].concat(ss).join(""));
         });
 
@@ -118,33 +139,33 @@ class MageCSSParser{
         });
 
     public static var sconnect = Monad.do_m(Parser,{
-        n < sid.or(sclass).or(stag).or(sattr);
-        names < (Monad.do_m(Parser,{
+        n < or(sid,sclass,stag,sattr);
+        names < many1(Monad.do_m(Parser,{
             char(".");
             name;
-            })).many1();
+            }));
         mPack(SConnect(n,names));
         });
 
-    public static var selement = sconnect.or(sid).or(sclass).or(stag).or(sattr);
+    public static var selement = or(sconnect,sid,sclass,stag,sattr);
 
 
     public static function selector(input:Input) : ParseResult<Input,ParseError,Selector> 
-        return Monad.do_m(Parser,{
+        return or(Monad.do_m(Parser,{
             selem < selement;
             spaces1;
             srest < selector;
             mPack(SDescendant(SElement(selem),srest));
             })
-            .or(Monad.do_m(Parser,{
+            ,Monad.do_m(Parser,{
                 selem < selement;
                 spaces;
                 char(">");
                 spaces;
                 srest < selector;
                 mPack(SChild(SElement(selem),srest));
-            }))
-            .or(Monad.do_m(Parser,{
+            })
+            ,Monad.do_m(Parser,{
                 elem < selement;
                 mPack(SElement(elem));
             }))(input);
@@ -155,11 +176,11 @@ class MageCSSParser{
     	});
 
     public static var value =  Monad.do_m(Parser,{
-    	s < nonchar(";").and(nonchar(" ")).many1();
+    	s < many1(Parser.and(nonchar(";"),nonchar(" ")));
     	mPack(s.join(""));
     	});
 
-    public static var block = Monad.do_m(Parser,{
+    public static var block = or(Monad.do_m(Parser,{
     	spaces;
     	p < property;
     	spaces;
@@ -170,9 +191,9 @@ class MageCSSParser{
     	char(";");
     	mPack({property:p, value:v});
     	})
-    	.or(failure("block error"));
+    	,failure("block error"));
 
-    public static var blocks = block.many();
+    public static var blocks = many(block);
 
 
     public static var cssElement : ParserC<MageCSSElement> = Monad.do_m(Parser,{
@@ -191,7 +212,7 @@ class MageCSSParser{
         spaces;
         string("package");
         spaces1;
-        p < (alphabet.or(number).or(char(".")).or(char("-")).or(char("_"))).many();
+        p < many(or(alphabet,number,char("."),char("-"),char("_")));
         char(";");
         mPack(p.join(""));
         });
@@ -199,12 +220,11 @@ class MageCSSParser{
     public static var css = Monad.do_m(Parser,{
         csspack < csspackage;
         spaces;
-    	css < cssElement.many();
+    	css < many(cssElement);
         spaces;
     	eof;
     	mPack({cssPackage:csspack,css:css});
     	});
 
     public static function parser(csstext:String)  return css(new Input(csstext));
-
 }
