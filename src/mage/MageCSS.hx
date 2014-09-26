@@ -13,14 +13,16 @@ typedef MageCSSElement =
 
 enum Selector{
 	SElement(e:SelectorElement);
-	SChild(parent:SelectorElement,child:Selector);
-	SDecendant(parent:SelectorElement,desendant:Selector);
+	SChild(parent:Selector,child:Selector);
+	SDescendant(parent:Selector,desendant:Selector);
 }
 
 enum SelectorElement{
 	SID(name:String);
 	SClass(name:String);
+	SConnect(element:SelectorElement,classes:Array<String>);
 	STag(name:String);
+	SAttr(code:String);
 }
 
 typedef Block = {

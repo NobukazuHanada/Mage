@@ -19,8 +19,12 @@ class TestMageCSSPreprocessor extends BuddySuite implements Buddy {
           var cssCodeData = MageCSSParser.parser(
 "package sample.package;
 
+p {
+  color : red;
+}
+
 div {
-  top : 10px;
+  background-color : blue;
 }"
             );
         
@@ -31,7 +35,7 @@ div {
             case _: null;
           }
 
-          result.should.be("div.sample-package{top:10px;}");
+          result.should.be("p.sample-package{color:red;}div.sample-package{background-color:blue;}");
         });
     });
   }

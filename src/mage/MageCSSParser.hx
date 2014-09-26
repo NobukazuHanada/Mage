@@ -96,22 +96,58 @@ class MageCSSParser{
     public static var sid = Monad.do_m(Parser,{
         char("#");
         n < name;
-        mPack(SElement(SID(n)));
+        mPack(SID(n));
         });
 
     public static var sclass = Monad.do_m(Parser,{
         char(".");
         n < name;
-        mPack(SElement(SClass(n)));
+        mPack(SClass(n));
         });
 
     public static var stag = Monad.do_m(Parser,{
         n < name;
-        mPack(SElement(STag(n)));
+        mPack(STag(n));
         });
 
+    public static var sattr = Monad.do_m(Parser,{
+        char("[");
+        n < nonchar("]").many();
+        char("]");
+        mPack(SAttr("[" + n.join("") + "]"));
+        });
 
-    public static var selector : ParserC<Selector> = sid.or(sclass).or(stag);
+    public static var sconnect = Monad.do_m(Parser,{
+        n < sid.or(sclass).or(stag).or(sattr);
+        names < (Monad.do_m(Parser,{
+            char(".");
+            name;
+            })).many1();
+        mPack(SConnect(n,names));
+        });
+
+    public static var selement = sconnect.or(sid).or(sclass).or(stag).or(sattr);
+
+
+    public static function selector(input:Input) : ParseResult<Input,ParseError,Selector> 
+        return Monad.do_m(Parser,{
+            selem < selement;
+            spaces1;
+            srest < selector;
+            mPack(SDescendant(SElement(selem),srest));
+            })
+            .or(Monad.do_m(Parser,{
+                selem < selement;
+                spaces;
+                char(">");
+                spaces;
+                srest < selector;
+                mPack(SChild(SElement(selem),srest));
+            }))
+            .or(Monad.do_m(Parser,{
+                elem < selement;
+                mPack(SElement(elem));
+            }))(input);
 
     public static var property =   Monad.do_m(Parser,{
     	s < nonchar(":").and(nonchar(" ")).many1();
