@@ -7,7 +7,9 @@ using buddy.Should;
 using Std;
 
 
-@:build(mage.CompileHTML.generate("<div><p>test</p></div>"))
+@:build(mage.CompileHTML.generate("
+  package foo.bar;
+  <div class='sample'><p class='sample'>test</p></div>"))
 class SimpleView{}
 
 @:build(mage.CompileHTML.generate("<div><p>{{test}}</p></div>"))
@@ -24,7 +26,7 @@ class TestCompileHTML extends BuddySuite implements Buddy {
     		var parentDom = js.Browser.document.createElement("div");
     		var simpleView = new SimpleView();
     		parentDom.appendChild(simpleView.nodes[0]);
-    		parentDom.innerHTML.should.be("<div><p>test</p></div>");
+    		parentDom.innerHTML.should.be('<div class="sample foo-bar"><p class="sample foo-bar">test</p></div>');
       	});
 
       	it("textNode binding test",{

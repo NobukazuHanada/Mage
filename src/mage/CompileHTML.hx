@@ -11,7 +11,18 @@ using Type;
 using StringTools;
 
 class CompileHTML{
-	macro public static function generate(s:String):Array<Field>{
+	macro public static function generate(inputText:String):Array<Field>{
+		var htmlCodePos = inputText.indexOf("<");
+		var headText = inputText.substring(0,htmlCodePos);
+		var packageRegExp = ~/package [^;]*;/;
+		var packageClass : String = if(packageRegExp.match(headText)){
+			 packageRegExp.matched(0).substring(8)
+							.replace(" ","")
+							.replace(";","")
+							.replace(".","-");
+		}else "";
+		var htmlCode = inputText.substring(htmlCodePos);
+
 		var vars = [];
 		var mageVars = [];
 		var mageEventVars = [];
@@ -40,8 +51,99 @@ class CompileHTML{
 				return exprs;
 			}else [macro js.Browser.document.createTextNode($v{text})];
 		}
+		
 
-		function elementNameToType(s:String)
+		function compileNode(node:HtmlNode){
+			if(node.getClass().getClassName() == "htmlparser.HtmlNodeText"){
+				var nodeText : HtmlNodeText = cast node;
+				var text = nodeText.text;
+				return compileText(text);
+			}else{
+				var nodeElement : HtmlNodeElement = cast node;
+				var name =  nodeElement.name;
+				var typeDom = elementNameToType(name);
+				var domNameExpr = macro var element : $typeDom =cast js.Browser.document.createElement($v{name});
+				var attributes = nodeElement.attributes;
+				var attrExprs = attributes.map(function(a){
+					return if(a.name == "mage-var"){
+							mageVars.push({name : a.value, type : typeDom});
+							var value = a.value;
+							macro this.$value = element;
+						}else{
+							macro element.setAttribute($v{a.name},$v{a.value});
+						}
+					});
+				if(packageClass != ""){
+					attrExprs.push(macro element.classList.add($v{packageClass}));
+				}	
+				var domExprs = [domNameExpr].concat(attrExprs);
+				var children = nodeElement.nodes;
+				var childrenExpr = children.map(function(c) 
+					return macro $b{compileNode(c).map(function(c)return macro element.appendChild($c))});
+				return [macro $b{domExprs.concat(childrenExpr).concat([macro element])}];
+			}
+		}
+
+		var htmlDocument = new HtmlDocument(htmlCode);
+		var firstNode = htmlDocument.nodes[0];
+		var nodesExpr = compileNode(firstNode);
+
+		var fields = Context.getBuildFields();
+
+		var newFunction : Function =  {
+			ret : null,
+			expr : (macro { 
+				this.nodes  = [];
+				$b{nodesExpr.map(function(e) return macro this.nodes.push($e))}
+			}),
+			args : vars.map(function(name) : FunctionArg return { name : name, value : null, type : null, opt : null })
+		}
+
+		var varsField = vars.map(function(v) return {
+				name : v,
+				doc : null,
+				meta : [],
+				access : [APublic],
+				kind : FVar(macro : js.html.Node),
+				pos : Context.currentPos()
+			});
+		fields = fields.concat(varsField);
+
+		var mageVarsField = mageVars.map(function(v) return {
+				name : v.name,
+				doc : null,
+				meta : [],
+				access : [APublic],
+				kind : FVar(v.type),
+				pos : Context.currentPos()
+			});
+		fields = fields.concat(mageVarsField);
+
+		var nodeField = {
+			name : "nodes",
+			doc : null,
+			meta : [],
+			access : [APublic],
+			kind : FVar(macro : Array<js.html.Node>),
+			pos : Context.currentPos()
+		}
+		fields.push(nodeField);
+
+		var newfield = {
+	      name: "new",
+	      doc: null,
+	      meta: [],
+	      access: [APublic],
+	      kind: FFun(newFunction),
+	      pos: Context.currentPos()
+	    };
+	    fields.push(newfield);
+
+
+		return fields;
+	}
+
+	private static function elementNameToType(s:String)
 			return switch (s) {
 				case "a": macro : js.html.AnchorElement;
 				case "applet" : macro : js.html.AppletElement;
@@ -120,92 +222,4 @@ class CompileHTML{
 				case "ul" : macro : js.html.UListElement;
 				case _ : macro : js.html.Element;
 			};
-		
-
-		function compileNode(node:HtmlNode){
-			if(node.getClass().getClassName() == "htmlparser.HtmlNodeText"){
-				var nodeText : HtmlNodeText = cast node;
-				var text = nodeText.text;
-				return compileText(text);
-			}else{
-				var nodeElement : HtmlNodeElement = cast node;
-				var name =  nodeElement.name;
-				var typeDom = elementNameToType(name);
-				var domNameExpr = macro var element : $typeDom =cast js.Browser.document.createElement($v{name});
-				var attributes = nodeElement.attributes;
-				var attrExprs = attributes.map(function(a){
-					return if(a.name == "mage-var"){
-							mageVars.push({name : a.value, type : typeDom});
-							var value = a.value;
-							macro this.$value = element;
-						}else{
-							macro element.setAttribute($v{a.name},$v{a.value});
-						}
-					});		
-				var domExprs = [domNameExpr].concat(attrExprs);
-				var children = nodeElement.nodes;
-				var childrenExpr = children.map(function(c) 
-					return macro $b{compileNode(c).map(function(c)return macro element.appendChild($c))});
-				return [macro $b{domExprs.concat(childrenExpr).concat([macro element])}];
-			}
-		}
-
-		var htmlDocument = new HtmlDocument(s);
-		var firstNode = htmlDocument.nodes[0];
-		var nodesExpr = compileNode(firstNode);
-
-		var fields = Context.getBuildFields();
-
-		var newFunction : Function =  {
-			ret : null,
-			expr : (macro { 
-				this.nodes  = [];
-				$b{nodesExpr.map(function(e) return macro this.nodes.push($e))}
-			}),
-			args : vars.map(function(name) : FunctionArg return { name : name, value : null, type : null, opt : null })
-		}
-
-		var varsField = vars.map(function(v) return {
-				name : v,
-				doc : null,
-				meta : [],
-				access : [APublic],
-				kind : FVar(macro : js.html.Node),
-				pos : Context.currentPos()
-			});
-		fields = fields.concat(varsField);
-
-		var mageVarsField = mageVars.map(function(v) return {
-				name : v.name,
-				doc : null,
-				meta : [],
-				access : [APublic],
-				kind : FVar(v.type),
-				pos : Context.currentPos()
-			});
-		fields = fields.concat(mageVarsField);
-
-		var nodeField = {
-			name : "nodes",
-			doc : null,
-			meta : [],
-			access : [APublic],
-			kind : FVar(macro : Array<js.html.Node>),
-			pos : Context.currentPos()
-		}
-		fields.push(nodeField);
-
-		var newfield = {
-	      name: "new",
-	      doc: null,
-	      meta: [],
-	      access: [APublic],
-	      kind: FFun(newFunction),
-	      pos: Context.currentPos()
-	    };
-	    fields.push(newfield);
-
-
-		return fields;
-	}
 }
