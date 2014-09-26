@@ -10,16 +10,15 @@ import sys.io.File;
 class CompileCSS{
 	public static var cssCode = "";
 
-	public static function generate(inputText:String){
-		
-		
+	@:build public static function generate(inputText:String){
 		var outputText = MageCSSPreprocessor.proprocess(inputText);
-		var fname = "mage.css";
+		var outputPathArray = Compiler.getOutput().split("/");
+		outputPathArray.pop();
+		var fname =   outputPathArray.join("/") + "mage.css";
 		CompileCSS.cssCode += outputText;
 		var fout = File.write( fname, false );
 		fout.writeString(CompileCSS.cssCode);
 		fout.close();
-
 		return Context.getBuildFields();
 	}
 }

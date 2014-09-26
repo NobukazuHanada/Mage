@@ -143,6 +143,7 @@ class CompileHTML{
 		return fields;
 	}
 
+	#if macro
 	private static function elementNameToType(s:String)
 			return switch (s) {
 				case "a": macro : js.html.AnchorElement;
@@ -222,4 +223,5 @@ class CompileHTML{
 				case "ul" : macro : js.html.UListElement;
 				case _ : macro : js.html.Element;
 			};
+		#end
 }
