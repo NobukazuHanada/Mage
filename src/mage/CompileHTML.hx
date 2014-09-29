@@ -39,7 +39,10 @@ class CompileHTML{
 						this.$varName = js.Browser.document.createTextNode($i{varName});
 						this.$varName;
 					}];
+				
 				vars.push(varName);
+				var textDom = macro : js.html.Text;
+				mageVars.push({name : varName, type : textDom });
 
 				if( leftString.length != 0 )
 					exprs.push(macro js.Browser.document.createTextNode($v{leftString}));
@@ -98,16 +101,6 @@ class CompileHTML{
 			}),
 			args : vars.map(function(name) : FunctionArg return { name : name, value : null, type : null, opt : null })
 		}
-
-		var varsField = vars.map(function(v) return {
-				name : v,
-				doc : null,
-				meta : [],
-				access : [APublic],
-				kind : FVar(macro : js.html.Node),
-				pos : Context.currentPos()
-			});
-		fields = fields.concat(varsField);
 
 		var mageVarsField = mageVars.map(function(v) return {
 				name : v.name,
