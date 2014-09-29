@@ -28,12 +28,51 @@ package ;
 import mage.CompileHTML;
 
 @:build(mage.CompileHTML.generate(
-'<div>
+'package sample.base;
+
+<html lang="ja">
+<head>
+	<meta charset="UTF-8">
+	<link rel="stylesheet" type="text/css" href="mage.css">
+	<title>Mage Sample</title>
+</head>
+<body>
+	<div mage-var="component"></div>	
+</body>
+</html>'
+))
+class BaseView{}
+
+@:build(mage.CompileCSS.generate(
+'package sample.view;
+
+p { color : red; }'
+))
+@:build(mage.CompileHTML.generate(
+'package sample.view;
+
+<div>
 	<p>{{message}}</p>
 	<input type="text" mage-var="input">
 </div>'
 ))
 class SampleView{}
+
+
+@:build(mage.CompileCSS.generate(
+'package sample.view2;
+
+p { color : blue; }'
+))
+@:build(mage.CompileHTML.generate(
+'package sample.view2;
+
+<div>
+	<p>{{message}}</p>
+	<input type="text" mage-var="input">
+</div>'
+))
+class SampleView2{}
 
 ```
 
@@ -43,15 +82,27 @@ class SampleView{}
 package ;
 
 import js.html.InputElement;
+import SampleView.BaseView;
+import SampleView.SampleView2;
 
 class Main{
 	public static function main(){
 		js.Browser.window.addEventListener("load",function(e){
+			var base = new BaseView();
+			js.Browser.document.body.appendChild(base.nodes[0]);
+
 			var sampleView = new SampleView("first!");
-			js.Browser.document.body.appendChild(sampleView.nodes[0]);
+			base.component.appendChild(sampleView.nodes[0]);
 
 			sampleView.input.addEventListener("change",function(e){
 				sampleView.message.nodeValue = sampleView.input.value;
+			});
+
+			var sampleView2 = new SampleView2("second!");
+			base.component.appendChild(sampleView2.nodes[0]);
+
+			sampleView2.input.addEventListener("change",function(e){
+				sampleView2.message.nodeValue = sampleView2.input.value;
 			});
 
 		});
@@ -73,14 +124,5 @@ class Main{
 
 ```html
 <!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>test</title>
-  <script src="main.js"></script>
-</head>
-<body>
-
-</body>
-</html>
+<script src="main.js"></script>
 ```
