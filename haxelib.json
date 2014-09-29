@@ -7,11 +7,12 @@
   "tags": ["web", "js"],
   "description":
       "This is MVW Frontend Framework as Haxe!",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "releasenote":
       "css preprocessor release",
   "contributors": ["nobkz"],
   "dependencies": {
+    "simpleMonad" : "",
     "htmlparser": "",
     "buddy" : ""
   }
