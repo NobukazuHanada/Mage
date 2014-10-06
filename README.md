@@ -31,8 +31,7 @@ import mage.CompileHTML;
 'package sample.base;
 
 
-<div mage-var="component"></div>	
-'
+<div mage-var="component"></div>'
 ))
 class BaseView{}
 
