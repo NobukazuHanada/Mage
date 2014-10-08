@@ -7,7 +7,7 @@ using Lambda;
 using mage.MageCSS;
 
 class MageCSSPreprocessor{
-	public static function proprocess(inputText:String) : String {
+	public static function preprocess(inputText:String) : String {
 		var result = MageCSSParser.parser(inputText);
 		return switch (result) {
 			case Success(ParseItem(p,_)): evalMageCSS(p);

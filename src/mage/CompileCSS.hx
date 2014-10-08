@@ -11,7 +11,7 @@ class CompileCSS{
 	public static var cssCode = "";
 
 	@:build public static function generate(inputText:String){
-		var outputText = MageCSSPreprocessor.proprocess(inputText);
+		var outputText = MageCSSPreprocessor.preprocess(inputText);
 		var outputPathArray = Compiler.getOutput().split("/");
 		outputPathArray.pop();
 		var fname =   outputPathArray.join("/") + "mage.css";
