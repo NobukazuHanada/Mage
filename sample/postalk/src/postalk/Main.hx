@@ -1,0 +1,7 @@
+package postalk;
+
+class Main{
+	public static function main(){
+
+	}
+}

@@ -6,8 +6,8 @@
   "classPath": "src/",
   "tags": ["web", "js"],
   "description":
-      "This is MVW Frontend Framework as Haxe!",
-  "version": "0.2.1",
+      "Frontend Framework on Haxe",
+  "version": "0.2.2",
   "releasenote":
       "css preprocessor release",
   "contributors": ["nobkz"],

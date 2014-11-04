@@ -1,0 +1,5 @@
+-cp ../src
+-lib HtmlParser
+-lib simpleMonad
+-main postalk.Main
+-js app/main.js

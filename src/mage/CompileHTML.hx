@@ -36,7 +36,7 @@ class CompileHTML{
 				var rightString = text.substring(matchedPos.pos + matchedText.length);
 
 				var exprs = [macro {
-						this.$varName = js.Browser.document.createTextNode($i{varName});
+						this.$varName = js.Browser.document.createTextNode(initValue.$varName);
 						this.$varName;
 					}];
 				
@@ -99,7 +99,7 @@ class CompileHTML{
 				this.nodes  = [];
 				$b{nodesExpr.map(function(e) return macro this.nodes.push($e))}
 			}),
-			args : vars.map(function(name) : FunctionArg return { name : name, value : null, type : null, opt : null })
+			args : if(vars.length == 0 ) [] else [{ name : "initValue", value : null, type : null, opt : null }]
 		}
 
 		var mageVarsField = mageVars.map(function(v) return {
