@@ -36,7 +36,10 @@ class CompileHTML{
 				var rightString = text.substring(matchedPos.pos + matchedText.length);
 
 				var exprs = [macro {
-						this.$varName = js.Browser.document.createTextNode(initValue.$varName);
+						if( initValue != null && initValue.$varName != null )
+						this.$varName = js.Browser.document.createTextNode(initValue.$varName)
+						else 
+						this.$varName = js.Browser.document.createTextNode("");
 						this.$varName;
 					}];
 				
@@ -93,13 +96,26 @@ class CompileHTML{
 
 		var fields = Context.getBuildFields();
 
+
+
+		var initType : ComplexType = ComplexType.TAnonymous(vars.map(function(vname)
+			return (({
+				name : vname,
+				pos : Context.currentPos(),
+				kind : FVar(macro : String),
+				meta : [{pos:Context.currentPos(), name : ":optional", params : [] }]
+			}) : Field)
+		));
+
+
+
 		var newFunction : Function =  {
 			ret : null,
 			expr : (macro { 
 				this.nodes  = [];
 				$b{nodesExpr.map(function(e) return macro this.nodes.push($e))}
 			}),
-			args : if(vars.length == 0 ) [] else [{ name : "initValue", value : null, type : null, opt : null }]
+			args : if(vars.length == 0 ) [] else [{ name : "initValue", value : null, type : initType, opt : true }]
 		}
 
 		var mageVarsField = mageVars.map(function(v) return {
