@@ -1,5 +1,5 @@
 -lib buddy
--lib htmlparser
+-lib HtmlParser
 -lib simpleMonad
 -main TestCompileHTML
 -cp src
