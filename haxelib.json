@@ -6,10 +6,10 @@
   "classPath": "src/",
   "tags": ["web", "js"],
   "description":
-      "Frontend Framework on Haxe",
+      "Frontend Library on Haxe",
   "version": "0.2.3",
   "releasenote":
-      "css preprocessor release",
+      "HTMl Generater add constructor types",
   "contributors": ["nobkz"],
   "dependencies": {
     "simpleMonad" : "",
