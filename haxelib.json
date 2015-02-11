@@ -7,7 +7,7 @@
   "tags": ["web", "js"],
   "description":
       "Frontend Library on Haxe",
-  "version": "0.2.3",
+  "version": "0.2.4",
   "releasenote":
       "HTMl Generater add constructor types",
   "contributors": ["nobkz"],
