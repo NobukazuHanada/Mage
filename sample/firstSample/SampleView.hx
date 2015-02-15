@@ -10,14 +10,14 @@ div > label { color : red; }'
 
 <div>
 	<label for="email">email</label>
-	<input id="email" type="text" mage-var="email"><br>
+	<input(email) id="email" type="text"><br>
 	<label for="user_id">userid</label>
-	<input id="user_id" type="text" mage-var="userId"><br>
+	<input(userId) id="user_id" type="text"><br>
 	<label for="pass">passowrd</label>
-	<input id="pass" type="text" mage-var="loginFrom"><br>
+	<input(loginForm) id="pass" type="text"><br>
 	<label for="confirm">confirm</label>
 	<input id="confirm" type="text" mage-var="confirm"><br>
-	<input mage-var="submit" type="submit">
+	<input(submit) type="submit">
 </div>'
 ))
 class CreateAccountFormView{}
@@ -32,8 +32,8 @@ p { color : blue; }'
 'package sample.view2;
 
 <div>
-	<p>{{message}}</p>
-	<p>{{name}}</p>
+	<p>{message}</p>
+	<p>{name}</p>
 </div>'
 ))
 class SampleView{}
@@ -48,7 +48,7 @@ class SampleView{}
 	<title>Mage Sample</title>
 </head>
 <body>
-	<div mage-var="component"></div>	
+	<div(component)></div>	
 </body>
 </html>'
 ))

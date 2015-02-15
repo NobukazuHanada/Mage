@@ -157,9 +157,11 @@ class MageHtmlParser {
     }));
 
     public static var attribute = Monad.do_m(Parser,{
-    	key < many1(and(nonchar("="),nonchar(">")));
+    	key < many1(and(nonchar("="),nonchar(">"),nonchar("'"),nonchar('"')));
     	char("=");
-    	value < many1(and(nonchar("="),nonchar(">"),nonspace));
+    	many(or(char("'"),char('"')));
+    	value < many1(and(nonchar("="),nonchar(">"),nonspace,nonchar("'"),nonchar('"')));
+    	many(or(char("'"),char('"')));
     	mPack({key:key.join(""), value:value.join("")});
     });
 

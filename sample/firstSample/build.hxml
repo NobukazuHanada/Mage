@@ -1,6 +1,5 @@
 -cp .
 -cp ../../src
 -lib simpleMonad
--lib HtmlParser
 -main Main
 -js main.js

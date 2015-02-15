@@ -75,6 +75,26 @@ class TestMageHtmlParser extends BuddySuite implements Buddy{
     			}
     		});
 
+    		it("simple dom has attrs single quatation",{
+    			var result = MageHtmlParser.parse("<div sample='foo' bar='baz'></div>");
+    			   switch(result){
+    				case Success(ParseItem(e,_)): 
+    					e.string().should.be(
+    						[E("div",[{key:"sample",value:"foo"},{key:"bar",value:"baz"}],[])].string());
+    				case _: fail("Parser Error");
+    			}
+    		});
+
+    		 it("simple dom has attrs dobule quatation",{
+    			var result = MageHtmlParser.parse('<div sample="foo" bar="baz"></div>');
+    			   switch(result){
+    				case Success(ParseItem(e,_)): 
+    					e.string().should.be(
+    						[E("div",[{key:"sample",value:"foo"},{key:"bar",value:"baz"}],[])].string());
+    				case _: fail("Parser Error");
+    			}
+    		});
+
     		it("simple no end tag",{
     			var result = MageHtmlParser.parse("<br>");
     			   switch(result){
