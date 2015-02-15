@@ -225,6 +225,16 @@ class TestMageHtmlParser extends BuddySuite implements Buddy{
                 }
             });
 
+            it("mage href attrbuite",{
+                var result = MageHtmlParser.parse('<a href="/">');
+                switch(result){
+                    case Success(ParseItem(e,_)): 
+                        e.string().should.be(
+                            [E("a",[{key:"href",value:"/"}],[])].string());
+                    case _: fail("Parser Error");
+                }
+            });
+
     	});
     }
 }

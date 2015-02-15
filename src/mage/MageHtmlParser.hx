@@ -163,6 +163,7 @@ class MageHtmlParser {
     }));
 
     public static var attrKeyChar = and(nonchar("="),nonchar(">"),nonchar("'"),nonchar('"'),nonspace,nonchar("/"));
+
     public static var attrValueChar = and(nonchar("="),nonchar(">"),nonchar("'"),nonchar('"'),nonchar("/"));
 
     public static var attribute = or(Monad.do_m(Parser,{
@@ -175,7 +176,7 @@ class MageHtmlParser {
         key < many1(attrKeyChar);
         char("=");
         char("'");
-        value < many(attrValueChar);
+        value < many(nonchar("'"));
         char("'");
         mPack({key:key.join(""), value:value.join("")});
     }),
@@ -184,7 +185,7 @@ class MageHtmlParser {
         mPack({key:key.join(""), value:""});
         char("=");
         char('"');
-        value < many(attrValueChar);
+        value < many(nonchar('"'));
         char('"');
         mPack({key:key.join(""), value:value.join("")});
     }),
