@@ -1,5 +1,6 @@
 -lib buddy
 -lib simpleMonad
+-lib utest
 -main TestCompileHTML
 -cp src
 -cp test

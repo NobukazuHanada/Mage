@@ -5,6 +5,7 @@ import mage.CompileHTML;
 import buddy.*;
 using buddy.Should;
 using Std;
+using utest.Assert;
 
 
 @:build(mage.CompileHTML.generate("
@@ -43,7 +44,8 @@ class TestCompileHTML extends BuddySuite implements Buddy {
 
         it("textNode construction test",{
           var textBindingView = new TextBindingView({});
-          textBindingView.test.nodeValue = "";
+          textBindingView.test.should.notNull();
+
          });
 
       	it("input binding text",{
