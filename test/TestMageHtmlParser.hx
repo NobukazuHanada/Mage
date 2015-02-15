@@ -235,6 +235,29 @@ class TestMageHtmlParser extends BuddySuite implements Buddy{
                 }
             });
 
+            it("svg tags",{
+                var text =
+                '<svg><rect /><path /></svg>';
+                var result = MageHtmlParser.parse(text);
+                switch(result){
+                    case Success(ParseItem(e,_)): 
+                        e.string().should.be(
+                            [E("svg",[],[E("rect",[],[]),E("path",[],[])])].string());
+                    case _: fail("Parser Error");
+                }
+            });
+            it("mage svg tags",{
+                var text =
+                '<svg><rect(rect) /><path(path) /></svg>';
+                var result = MageHtmlParser.parse(text);
+                switch(result){
+                    case Success(ParseItem(e,_)): 
+                        e.string().should.be(
+                            [E("svg",[],[MageE("rect",[],[],"rect"),MageE("path",[],[],"path")])].string());
+                    case _: fail("Parser Error");
+                }
+            });
+
     	});
     }
 }

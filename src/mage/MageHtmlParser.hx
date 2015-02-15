@@ -109,17 +109,24 @@ class MageHtmlParser {
             return Parser.or(item,acc),failure("no noEndTag!"));
     
 
-    public static var noEndTag = Monad.do_m(Parser,{
+    public static var noEndTag = or(Monad.do_m(Parser,{
     	char("<");
     	name < noEndTagNameStrings;
     	attrs < tagAttrs;
         spaces;
-        many(char("/"));
     	char(">");
     	mPack(E(name,attrs,[]));
-    });
+    }),
+    Monad.do_m(Parser,{
+        char("<");
+        name < many(and(nonchar("/"),nonchar(">"),nonspace,nonchar("("),nonchar(")")));
+        attrs < tagAttrs;
+        spaces;
+        string("/>");
+        mPack(E(name.join(""),attrs,[]));
+    }));
 
-    public static var noEndMageTag = Monad.do_m(Parser,{
+    public static var noEndMageTag = or(Monad.do_m(Parser,{
     	char("<");
     	name < noEndTagNameStrings;
     	char("(");
@@ -129,10 +136,24 @@ class MageHtmlParser {
     	char(")");
     	attrs < tagAttrs;
         spaces;
-        many(char("/"));
     	char(">");
     	mPack(MageE(name,attrs,[],varname.join("")));
-    });
+    }),
+        Monad.do_m(Parser,{
+        char("<");
+        name < many(and(nonchar("/"),nonchar(">"),nonspace,nonchar("("),nonchar(")")));
+        char("(");
+        spaces;
+        varname < many(and(nonchar(")"),nonspace));
+        spaces;
+        char(")");
+        attrs < tagAttrs;
+        spaces;
+        string("/>");
+        mPack(MageE(name.join(""),attrs,[],varname.join("")));
+    }));
+
+
 
     public static var mageTagBegin = Monad.do_m(Parser,{
     		char("<");
