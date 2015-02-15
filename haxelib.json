@@ -7,7 +7,7 @@
   "tags": ["web", "js"],
   "description":
       "Frontend Library on Haxe",
-  "version": "0.3.1",
+  "version": "0.3.2",
   "releasenote":
       "Mage HTML Parser Bug fixed",
   "contributors": ["nobkz"],
