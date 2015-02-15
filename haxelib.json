@@ -9,9 +9,9 @@
       "Frontend Library on Haxe",
   "version": "0.3.0",
   "releasenote":
-      "HTMl Generater add constructor types",
+      "HTML Generater add constructor types",
   "contributors": ["nobkz"],
   "dependencies": {
-    "simpleMonad" : "",
+    "simpleMonad" : ""
   }
 }
