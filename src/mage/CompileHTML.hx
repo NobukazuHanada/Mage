@@ -1,11 +1,10 @@
 package mage;
 
-import htmlparser.HtmlDocument;
-import htmlparser.HtmlNodeElement;
-import htmlparser.HtmlNodeText;
-import htmlparser.HtmlNode;
 import haxe.macro.Expr;
 import haxe.macro.Context;
+import mage.MageHtmlParser.Node;
+import simple.monads.Result;
+import simple.monads.Parser.ParseItem;
 
 using Type;
 using StringTools;
@@ -25,75 +24,58 @@ class CompileHTML{
 
 		var vars = [];
 		var mageVars = [];
-		var mageEventVars = [];
-		function compileText(text : String){
-			var varMatcher = ~/{{[^}]*}}/;
-			return if( varMatcher.match(text) ){
-				var matchedPos = varMatcher.matchedPos();
-				var matchedText = varMatcher.matched(0);
-				var varName = matchedText.substring(2, matchedText.length-2).ltrim().rtrim();
-				var leftString = text.substring(0,matchedPos.pos);
-				var rightString = text.substring(matchedPos.pos + matchedText.length);
+		
 
-				var exprs = [macro {
-						if( initValue != null && initValue.$varName != null )
-						this.$varName = js.Browser.document.createTextNode(initValue.$varName)
+		function compileNode(node) : Array<Expr>{
+			return switch(node){
+				case E(name,attributes,childNodes):
+					var typeDom = elementNameToType(name);
+					var domNameExpr = macro var element : $typeDom =cast js.Browser.document.createElement($v{name});
+					var attrExprs = attributes.map(function(attr) 
+						return macro element.setAttribute($v{attr.key},$v{attr.value}));
+					if(packageClass != null && packageClass != "")
+						attrExprs.push(macro element.classList.add($v{packageClass}));
+					var domExprs = [domNameExpr].concat(attrExprs);
+					var childrenExpr = childNodes.map(function(c) 
+					 	return macro $b{compileNode(c).map(function(c)return macro element.appendChild($c))});
+					[macro $b{domExprs.concat(childrenExpr).concat([macro element])}];
+				case MageE(name,attributes,childNodes,varname):
+					var typeDom = elementNameToType(name);
+					var domNameExpr = macro var element : $typeDom =cast js.Browser.document.createElement($v{name});
+					var attrExprs = attributes.map(function(attr) 
+						return macro element.setAttribute($v{attr.key},$v{attr.value}));	
+					if(packageClass != null && packageClass != "")
+						attrExprs.push(macro element.classList.add($v{packageClass}));
+					 mageVars.push({name : varname, type : typeDom});
+					 var thisValueExpr = macro this.$varname = element;
+					 var domExprs = [domNameExpr,thisValueExpr].concat(attrExprs);
+					 var childrenExpr = childNodes.map(function(c) 
+					 	return macro $b{compileNode(c).map(function(c)return macro element.appendChild($c))});
+					[macro $b{domExprs.concat(childrenExpr).concat([macro element])}];
+				case Text(text):
+					[macro js.Browser.document.createTextNode($v{text})];
+				case MageText(varname):
+					var textDom = macro : js.html.Text;
+					vars.push(varname);
+					mageVars.push({name : varname, type : textDom });
+					[macro {
+						if( initValue != null && initValue.$varname != null )
+						this.$varname = js.Browser.document.createTextNode(initValue.$varname)
 						else 
-						this.$varName = js.Browser.document.createTextNode("");
-						this.$varName;
+						this.$varname = js.Browser.document.createTextNode("");
+						this.$varname;
 					}];
-				
-				vars.push(varName);
-				var textDom = macro : js.html.Text;
-				mageVars.push({name : varName, type : textDom });
-
-				if( leftString.length != 0 )
-					exprs.push(macro js.Browser.document.createTextNode($v{leftString}));
-
-				if( rightString.length != 0 ){
-					exprs.concat(compileText(rightString));
-				}
-
-				return exprs;
-			}else [macro js.Browser.document.createTextNode($v{text})];
+			}
 		}
 		
 
-		function compileNode(node:HtmlNode){
-			if(node.getClass().getClassName() == "htmlparser.HtmlNodeText"){
-				var nodeText : HtmlNodeText = cast node;
-				var text = nodeText.text;
-				return compileText(text);
-			}else{
-				var nodeElement : HtmlNodeElement = cast node;
-				var name =  nodeElement.name;
-				var typeDom = elementNameToType(name);
-				var domNameExpr = macro var element : $typeDom =cast js.Browser.document.createElement($v{name});
-				var attributes = nodeElement.attributes;
-				var attrExprs = attributes.map(function(a){
-					return if(a.name == "mage-var"){
-							mageVars.push({name : a.value, type : typeDom});
-							var value = a.value;
-							macro this.$value = element;
-						}else{
-							macro element.setAttribute($v{a.name},$v{a.value});
-						}
-					});
-				if(packageClass != ""){
-					attrExprs.push(macro element.classList.add($v{packageClass}));
-				}	
-				var domExprs = [domNameExpr].concat(attrExprs);
-				var children = nodeElement.nodes;
-				var childrenExpr = children.map(function(c) 
-					return macro $b{compileNode(c).map(function(c)return macro element.appendChild($c))});
-				return [macro $b{domExprs.concat(childrenExpr).concat([macro element])}];
-			}
+	 
+		var htmlNode = switch(mage.MageHtmlParser.parse(htmlCode)){
+			case Success(ParseItem(htmlNode,_)):htmlNode;
+			case Error(error) : null;
+			case _ : null;
 		}
-
-		var htmlDocument = new HtmlDocument(htmlCode);
-		var firstNode = htmlDocument.nodes[0];
-		var nodesExpr = compileNode(firstNode);
-
+		var nodesExpr = compileNode(htmlNode[0]);
 		var fields = Context.getBuildFields();
 
 

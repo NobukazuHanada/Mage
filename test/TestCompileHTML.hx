@@ -9,13 +9,13 @@ using Std;
 
 @:build(mage.CompileHTML.generate("
   package foo.bar;
-  <div class='sample'><p class='sample'>test</p></div>"))
+  <div class=sample><p class=sample>test</p></div>"))
 class SimpleView{}
 
-@:build(mage.CompileHTML.generate("<div><p>{{test}}</p></div>"))
+@:build(mage.CompileHTML.generate("<div><p>{test}</p></div>"))
 class TextBindingView{}
 
-@:build(mage.CompileHTML.generate('<div><input type="text" mage-var="input"/></div>'))
+@:build(mage.CompileHTML.generate('<div><input(input) type=text></div>'))
 class InputBindingView{}
 
 class TestCompileHTML extends BuddySuite implements Buddy {
