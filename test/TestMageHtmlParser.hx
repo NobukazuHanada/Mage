@@ -258,6 +258,18 @@ class TestMageHtmlParser extends BuddySuite implements Buddy{
                 }
             });
 
+            it("comment out test",{
+                var text =
+                '<div><!-- <div>fdafda</div> --></div>';
+                var result = MageHtmlParser.parse(text);
+                switch(result){
+                    case Success(ParseItem(e,_)): 
+                        e.string().should.be(
+                            [E("div",[],[CommentOut])].string());
+                    case _: fail("Parser Error");
+                }
+            });
+
     	});
     }
 }

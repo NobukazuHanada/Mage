@@ -65,6 +65,8 @@ class CompileHTML{
 						this.$varname = js.Browser.document.createTextNode("");
 						this.$varname;
 					}];
+				case CommentOut:
+					[macro null];
 			}
 		}
 		

@@ -16,6 +16,7 @@ enum Node{
     Text(text:String);
     MageText(varname:String);
     MageE(name:String,attr:Array<{key:String,value:String}>,childNode:Array<Node>,varname:String);
+    CommentOut;
 }
 
 
@@ -266,7 +267,7 @@ class MageHtmlParser {
     
 
     public static function node(input:Input)
-    	return or(text,mageText,noEndTag,noEndMageTag,tag,mageTag)(input);
+    	return or(commentOut,text,mageText,noEndTag,noEndMageTag,tag,mageTag)(input);
 
     public static function nodes(input:Input)
     	return many(node)(input);
@@ -276,6 +277,29 @@ class MageHtmlParser {
     	t < many1(and(nonchar("<"),nonchar(">"),nonchar("{"),nonchar("}")));
     	mPack(Text(t.join("")));
     });
+
+    public static var commentOut = Monad.do_m(Parser,{
+        string("<!--");
+        commentEnd;
+    });
+
+    public static function commentEnd(input:Input)
+        return Monad.do_m(Parser,{
+            many(nonchar("-"));
+            i < item;
+            if( i == "-" ) 
+                Monad.do_m(Parser,{
+                    i < item;
+                    if( i == "-" ) 
+                        Monad.do_m(Parser,{
+                            i < item;
+                            if( i == ">" ) mPack(CommentOut) 
+                            else commentEnd;
+                        })
+                    else commentEnd;
+                }) 
+            else commentEnd;
+            })(input);
 
     public static var mageText = Monad.do_m(Parser,{
     	char("{");
