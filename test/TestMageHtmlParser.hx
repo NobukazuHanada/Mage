@@ -176,6 +176,25 @@ class TestMageHtmlParser extends BuddySuite implements Buddy{
     			}
     		});
 
+            it("no end tag attrs",{
+                var result = MageHtmlParser.parse('<input type="text" />');
+                   switch(result){
+                    case Success(ParseItem(e,_)): 
+                        e.string().should.be(
+                            [E("input",[{key:"type",value:"text"}],[])].string());
+                    case _: fail("Parser Error");
+                }
+            });
+            it("no end mage tag attrs",{
+                var result = MageHtmlParser.parse('<input(input) type="text" />');
+                   switch(result){
+                    case Success(ParseItem(e,_)): 
+                        e.string().should.be(
+                            [MageE("input",[{key:"type",value:"text"}],[],"input")].string());
+                    case _: fail("Parser Error");
+                }
+            });
+
     	});
     }
 }

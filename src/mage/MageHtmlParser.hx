@@ -113,6 +113,8 @@ class MageHtmlParser {
     	char("<");
     	name < noEndTagNameStrings;
     	attrs < tagAttrs;
+        spaces;
+        many(char("/"));
     	char(">");
     	mPack(E(name,attrs,[]));
     });
@@ -126,6 +128,8 @@ class MageHtmlParser {
     	spaces;
     	char(")");
     	attrs < tagAttrs;
+        spaces;
+        many(char("/"));
     	char(">");
     	mPack(MageE(name,attrs,[],varname.join("")));
     });
