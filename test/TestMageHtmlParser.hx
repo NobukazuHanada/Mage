@@ -195,6 +195,36 @@ class TestMageHtmlParser extends BuddySuite implements Buddy{
                 }
             });
 
+            it("element attribute non value pattern",{
+                var text = '<textarea name="" id cols="30" rows="10" ></textarea>';
+                var result = MageHtmlParser.parse(text);
+                switch(result){
+                    case Success(ParseItem(e,_)): 
+                        e.string().should.be(
+                            [E("textarea",[
+                                {key:"name",value:""},
+                                {key:"id",value:""},
+                                {key:"cols",value:"30"},
+                                {key:"rows",value:"10"}],[])].string());
+                    case _: fail("Parser Error");
+                }
+            });
+
+             it("mage element attribute non value pattern",{
+                var text = '<textarea(comment) name="" id cols="30" rows="10" ></textarea>';
+                var result = MageHtmlParser.parse(text);
+                switch(result){
+                    case Success(ParseItem(e,_)): 
+                        e.string().should.be(
+                            [MageE("textarea",[
+                                {key:"name",value:""},
+                                {key:"id",value:""},
+                                {key:"cols",value:"30"},
+                                {key:"rows",value:"10"}],[],"comment")].string());
+                    case _: fail("Parser Error");
+                }
+            });
+
     	});
     }
 }

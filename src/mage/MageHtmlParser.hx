@@ -143,6 +143,7 @@ class MageHtmlParser {
     		spaces;
     		char(")");
     		attrs < tagAttrs;
+            spaces;
     		char(">");
     		mPack(MageE(name.join(""),attrs,[],varname.join("")));
     	});
@@ -151,6 +152,7 @@ class MageHtmlParser {
     		char("<");
     		name < many(and(nonchar("/"),nonchar(">"),nonspace,nonchar("("),nonchar(")")));
     		attrs < tagAttrs;
+            spaces;
     		char(">");
     		mPack(E(name.join(""),attrs,[]));
     	});
@@ -160,14 +162,36 @@ class MageHtmlParser {
     	attribute;
     }));
 
-    public static var attribute = Monad.do_m(Parser,{
-    	key < many1(and(nonchar("="),nonchar(">"),nonchar("'"),nonchar('"')));
+    public static var attrKeyChar = and(nonchar("="),nonchar(">"),nonchar("'"),nonchar('"'),nonspace,nonchar("/"));
+    public static var attrValueChar = and(nonchar("="),nonchar(">"),nonchar("'"),nonchar('"'),nonchar("/"));
+
+    public static var attribute = or(Monad.do_m(Parser,{
+    	key < many1(attrKeyChar);
     	char("=");
-    	many(or(char("'"),char('"')));
-    	value < many1(and(nonchar("="),nonchar(">"),nonspace,nonchar("'"),nonchar('"')));
-    	many(or(char("'"),char('"')));
+    	value < many1(and(attrValueChar,nonspace));
     	mPack({key:key.join(""), value:value.join("")});
-    });
+    }),
+    Monad.do_m(Parser,{
+        key < many1(attrKeyChar);
+        char("=");
+        char("'");
+        value < many(attrValueChar);
+        char("'");
+        mPack({key:key.join(""), value:value.join("")});
+    }),
+    Monad.do_m(Parser,{
+        key < many1(attrKeyChar);
+        mPack({key:key.join(""), value:""});
+        char("=");
+        char('"');
+        value < many(attrValueChar);
+        char('"');
+        mPack({key:key.join(""), value:value.join("")});
+    }),
+    Monad.do_m(Parser,{
+        key < many1(attrKeyChar);
+        mPack({key:key.join(""), value:""});
+    }));
 
     public static function tagEnd(nameNode:Node){
     	return switch(nameNode){
