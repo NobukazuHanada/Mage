@@ -31,7 +31,7 @@ import mage.CompileHTML;
 'package sample.base;
 
 
-<div mage-var="component"></div>'
+<div(component) ></div>'
 ))
 class BaseView{}
 
@@ -44,8 +44,8 @@ p { color : red; }'
 'package sample.view;
 
 <div>
-	<p>{{message}}</p>
-	<input type="text" mage-var="input">
+	<p>{message}</p>
+	<input(input) type="text" >
 </div>'
 ))
 class SampleView{}
@@ -60,8 +60,8 @@ p { color : blue; }'
 'package sample.view2;
 
 <div>
-	<p>{{message}}</p>
-	<input type="text" mage-var="input">
+	<p>{message}</p>
+	<input(input) type="text">
 </div>'
 ))
 class SampleView2{}
