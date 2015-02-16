@@ -80,6 +80,9 @@ class CompileHTML{
 			case Error(error) : null;
 			case _ : null;
 		}
+		if( htmlNode == [] ){
+			throw "parse error";
+		}
 		var nodesExpr = compileNode(htmlNode[0]);
 		var fields = Context.getBuildFields();
 
@@ -101,6 +104,7 @@ class CompileHTML{
 			expr : (macro { 
 				this.nodes  = [];
 				$b{nodesExpr.map(function(e) return macro this.nodes.push($e))}
+				this.root = cast this.nodes[0];
 			}),
 			args : if(vars.length == 0 ) [] else [{ name : "initValue", value : null, type : initType, opt : true }]
 		}
@@ -125,6 +129,16 @@ class CompileHTML{
 		}
 		fields.push(nodeField);
 
+		var rootField = {
+			name : "root",
+			doc : null,
+			meta : [],
+			access : [APublic],
+			kind : FVar(roottype(htmlNode[0])),
+			pos : Context.currentPos()
+		}
+		fields.push(rootField);
+
 		var newfield = {
 	      name: "new",
 	      doc: null,
@@ -138,6 +152,16 @@ class CompileHTML{
 
 		return fields;
 	}
+
+	#if macro
+	private static function roottype(node:Node){
+		return switch (node) {
+			case E(name,_,_):elementNameToType(name);
+			case MageE(name,_,_,_):elementNameToType(name);
+			case _ : macro : js.html.Text;
+		};
+	}
+	#end
 
 	#if macro
 	private static function elementNameToType(s:String)

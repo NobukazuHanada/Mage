@@ -7,9 +7,9 @@
   "tags": ["web", "js"],
   "description":
       "Frontend Library on Haxe",
-  "version": "0.3.3",
+  "version": "0.3.4",
   "releasenote":
-      "Mage HTML Parser Bug fixed",
+      "add root node fields",
   "contributors": ["nobkz"],
   "dependencies": {
     "simpleMonad" : ""

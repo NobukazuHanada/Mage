@@ -26,14 +26,14 @@ class TestCompileHTML extends BuddySuite implements Buddy {
     	it("simple Dom test",{
     		var parentDom = js.Browser.document.createElement("div");
     		var simpleView = new SimpleView();
-    		parentDom.appendChild(simpleView.nodes[0]);
+    		parentDom.appendChild(simpleView.root);
     		parentDom.innerHTML.should.be('<div class="sample foo-bar"><p class="sample foo-bar">test</p></div>');
       	});
 
       	it("textNode binding test",{
       		var parentDom = js.Browser.document.createElement("div");
       		var textBindingView = new TextBindingView({test:"Hello"});
-      		parentDom.appendChild(textBindingView.nodes[0]);
+      		parentDom.appendChild(textBindingView.root);
     		parentDom.innerHTML.should.be("<div><p>Hello</p></div>");
 
         var test : js.html.Text = textBindingView.test;

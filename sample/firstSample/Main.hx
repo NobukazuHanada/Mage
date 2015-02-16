@@ -8,13 +8,13 @@ class Main{
 	public static function main(){
 		js.Browser.window.addEventListener("load",function(e){
 			var base = new BaseView();
-			js.Browser.document.body.appendChild(base.nodes[0]);
+			js.Browser.document.body.appendChild(base.root);
 
 			var sampleView = new SampleView({message:"hello!", name:"@nobkz"});
-			base.component.appendChild(sampleView.nodes[0]);
+			base.root.appendChild(sampleView.root);
 
 			var accountView = new CreateAccountFormView();
-			base.component.appendChild(accountView.nodes[0]);
+			base.root.appendChild(accountView.root);
 		});
 	}
 }
