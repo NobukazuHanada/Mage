@@ -66,7 +66,7 @@ class CompileHTML{
 						this.$varname;
 					}];
 				case CommentOut:
-					[macro null];
+					[];
 			}
 		}
 		
