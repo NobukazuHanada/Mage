@@ -37,7 +37,9 @@ class CompileHTML{
 						attrExprs.push(macro element.classList.add($v{packageClass}));
 					var domExprs = [domNameExpr].concat(attrExprs);
 					var childrenExpr = childNodes.map(function(c) 
-					 	return macro $b{compileNode(c).map(function(c)return macro element.appendChild($c))});
+					 	return macro $b{compileNode(c).map(function(c)
+					 		return if(c != null) macro element.appendChild($c)
+					 		else macro null)});
 					[macro $b{domExprs.concat(childrenExpr).concat([macro element])}];
 				case MageE(name,attributes,childNodes,varname):
 					var typeDom = elementNameToType(name);
@@ -50,7 +52,9 @@ class CompileHTML{
 					 var thisValueExpr = macro this.$varname = element;
 					 var domExprs = [domNameExpr,thisValueExpr].concat(attrExprs);
 					 var childrenExpr = childNodes.map(function(c) 
-					 	return macro $b{compileNode(c).map(function(c)return macro element.appendChild($c))});
+					 	return macro $b{compileNode(c).map(function(c)
+					 		return if(c != null ) macro element.appendChild($c) 
+					 		else macro null)});
 					[macro $b{domExprs.concat(childrenExpr).concat([macro element])}];
 				case Text(text):
 					[macro js.Browser.document.createTextNode($v{text})];
@@ -65,8 +69,7 @@ class CompileHTML{
 						this.$varname = js.Browser.document.createTextNode("");
 						this.$varname;
 					}];
-				case CommentOut:
-					[];
+				case CommentOut: [];
 			}
 		}
 		
