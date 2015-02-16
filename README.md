@@ -25,30 +25,27 @@ add build.hxml
 ```haxe
 package ;
 
-import mage.CompileHTML;
-
-@:build(mage.CompileHTML.generate(
-'package sample.base;
-
-
-<div(component) ></div>'
-))
-class BaseView{}
-
 @:build(mage.CompileCSS.generate(
 'package sample.view;
 
-p { color : red; }'
+div > label { color : red; }'
 ))
 @:build(mage.CompileHTML.generate(
 'package sample.view;
 
 <div>
-	<p>{message}</p>
-	<input(input) type="text" >
+	<label for="email">email</label>
+	<input(email) id="email" type="text"><br>
+	<label for="user_id">userid</label>
+	<input(userId) id="user_id" type="text"><br>
+	<label for="pass">passowrd</label>
+	<input(loginForm) id="pass" type="text"><br>
+	<label for="confirm">confirm</label>
+	<input id="confirm" type="text" mage-var="confirm"><br>
+	<input(submit) type="submit">
 </div>'
 ))
-class SampleView{}
+class CreateAccountFormView{}
 
 
 @:build(mage.CompileCSS.generate(
@@ -61,10 +58,17 @@ p { color : blue; }'
 
 <div>
 	<p>{message}</p>
-	<input(input) type="text">
+	<p>{name}</p>
 </div>'
 ))
-class SampleView2{}
+class SampleView{}
+
+@:build(mage.CompileHTML.generate(
+'package sample.base;
+
+<div></div>	'
+))
+class BaseView{}
 
 ```
 
@@ -75,28 +79,19 @@ package ;
 
 import js.html.InputElement;
 import SampleView.BaseView;
-import SampleView.SampleView2;
+import SampleView.CreateAccountFormView;
 
 class Main{
 	public static function main(){
 		js.Browser.window.addEventListener("load",function(e){
 			var base = new BaseView();
-			js.Browser.document.body.appendChild(base.nodes[0]);
+			js.Browser.document.body.appendChild(base.root);
 
-			var sampleView = new SampleView("first!");
-			base.component.appendChild(sampleView.nodes[0]);
+			var sampleView = new SampleView({message:"hello!", name:"@nobkz"});
+			base.root.appendChild(sampleView.root);
 
-			sampleView.input.addEventListener("change",function(e){
-				sampleView.message.nodeValue = sampleView.input.value;
-			});
-
-			var sampleView2 = new SampleView2("second!");
-			base.component.appendChild(sampleView2.nodes[0]);
-
-			sampleView2.input.addEventListener("change",function(e){
-				sampleView2.message.nodeValue = sampleView2.input.value;
-			});
-
+			var accountView = new CreateAccountFormView();
+			base.root.appendChild(accountView.root);
 		});
 	}
 }
@@ -105,7 +100,6 @@ class Main{
 **build.hxml**
 
 ```
--cp sample
 -lib Mage
 -js main.js
 -main Main
@@ -116,5 +110,14 @@ class Main{
 
 ```html
 <!DOCTYPE html>
-<script src="main.js"></script>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title> first Sample Mage </title>
+	<link href="mage.css" rel="stylesheet" type="text/css">
+</head>
+<body>
+	<script src="main.js"></script>
+</body>
+</html>
 ```
