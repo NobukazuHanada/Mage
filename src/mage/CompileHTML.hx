@@ -98,17 +98,6 @@ class CompileHTML{
 		));
 
 
-
-		var newFunction : Function =  {
-			ret : null,
-			expr : (macro { 
-				this.nodes  = [];
-				$b{nodesExpr.map(function(e) return macro this.nodes.push($e))}
-				this.root = cast this.nodes[0];
-			}),
-			args : if(vars.length == 0 ) [] else [{ name : "initValue", value : null, type : initType, opt : true }]
-		}
-
 		var mageVarsField = mageVars.map(function(v) return {
 				name : v.name,
 				doc : null,
@@ -139,6 +128,53 @@ class CompileHTML{
 		}
 		fields.push(rootField);
 
+		fields = new_function_create(fields,nodesExpr,vars,initType);
+
+		return fields;
+	}
+
+	#if macro
+	private static function new_function_create(fields : Array<Field>, nodesExpr, vars, initType) : Array<Field>{
+		var new_func = null;
+		var new_expr = null;
+		var new_args = [];
+
+		for( f in fields ){
+			switch (f) {
+				case {
+					name:"new", 
+					pos:_pos, 
+					kind:FFun({
+						args : args,
+						expr : expr
+						})
+					}:
+					new_func = f;
+					new_args = args;
+					new_expr = expr;
+				case _: null;
+			}
+		}
+
+		if( new_func != null ){
+			fields.remove(new_func);
+		}
+
+		var newFunction : Function =  {
+			ret : null,
+			expr : if( new_func == null ) macro { 
+				this.nodes  = [];
+				$b{nodesExpr.map(function(e) return macro this.nodes.push($e))}
+				this.root = cast this.nodes[0];
+			} else macro { 
+				this.nodes  = [];
+				$b{nodesExpr.map(function(e) return macro this.nodes.push($e))}
+				this.root = cast this.nodes[0];
+				$new_expr;
+			},
+			args : if(vars.length == 0 ) new_args else new_args.concat([{ name : "initValue", value : null, type : initType, opt : true }])
+		}
+
 		var newfield = {
 	      name: "new",
 	      doc: null,
@@ -148,10 +184,9 @@ class CompileHTML{
 	      pos: Context.currentPos()
 	    };
 	    fields.push(newfield);
-
-
 		return fields;
 	}
+	#end
 
 	#if macro
 	private static function roottype(node:Node){

@@ -13,6 +13,25 @@ using utest.Assert;
   <div class=sample><p class=sample>test</p></div>"))
 class SimpleView{}
 
+@:build(mage.CompileHTML.generate("
+package foo.bar;
+
+<div class=sample>
+  <div(content)></div>
+</div>"))
+class SimpleView2{
+  var a = null;
+  var b = null;
+ public function new(a,b:Int){
+  this.a = a;
+  this.b = b;
+  this.content.appendChild((new SimpleView()).root);
+ }
+ public function getResult(){
+  return a + b;
+ }
+}
+
 @:build(mage.CompileHTML.generate("<div><p>{test}</p></div>"))
 class TextBindingView{}
 
@@ -58,6 +77,11 @@ class TestCompileHTML extends BuddySuite implements Buddy {
       		input.nodeName.should.be(expectedDom.nodeName);
       		input.getAttribute("type").should.be(expectedDom.getAttribute("type"));
       	});
+
+        it("new function test",{
+          var func = new SimpleView2(1,2);
+          func.getResult().should.be(3);
+        });
     });
   }
 }
