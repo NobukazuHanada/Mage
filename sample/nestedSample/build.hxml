@@ -1,0 +1,5 @@
+-cp .
+-cp ../../src
+-lib simpleMonad
+-main Main
+-js main.js
