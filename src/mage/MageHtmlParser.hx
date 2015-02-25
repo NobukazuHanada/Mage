@@ -15,7 +15,6 @@ enum Node{
     E(name:String,attr:Array<{key:String,value:String}>,childNode:Array<Node>);
     Text(text:String);
     MageText(varname:String);
-    MageE(name:String,attr:Array<{key:String,value:String}>,childNode:Array<Node>,varname:String);
     CommentOut;
 }
 
@@ -127,48 +126,8 @@ class MageHtmlParser {
         mPack(E(name.join(""),attrs,[]));
     }));
 
-    public static var noEndMageTag = or(Monad.do_m(Parser,{
-    	char("<");
-    	name < noEndTagNameStrings;
-    	char("(");
-    	spaces;
-    	varname < many(and(nonchar(")"),nonspace));
-    	spaces;
-    	char(")");
-    	attrs < tagAttrs;
-        spaces;
-    	char(">");
-    	mPack(MageE(name,attrs,[],varname.join("")));
-    }),
-        Monad.do_m(Parser,{
-        char("<");
-        name < many(and(nonchar("/"),nonchar(">"),nonspace,nonchar("("),nonchar(")")));
-        char("(");
-        spaces;
-        varname < many(and(nonchar(")"),nonspace));
-        spaces;
-        char(")");
-        attrs < tagAttrs;
-        spaces;
-        string("/>");
-        mPack(MageE(name.join(""),attrs,[],varname.join("")));
-    }));
 
 
-
-    public static var mageTagBegin = Monad.do_m(Parser,{
-    		char("<");
-    		name < many(and(nonchar("/"),nonchar(">"),nonspace,nonchar("("),nonchar(")")));
-    		char("(");
-    		spaces;
-    		varname < many(and(nonchar(")"),nonspace));
-    		spaces;
-    		char(")");
-    		attrs < tagAttrs;
-            spaces;
-    		char(">");
-    		mPack(MageE(name.join(""),attrs,[],varname.join("")));
-    	});
 
     public static var tagBegin = Monad.do_m(Parser,{
     		char("<");
@@ -222,10 +181,6 @@ class MageHtmlParser {
 		    	Monad.do_m(Parser,{
 		    		string("</"+name+">");
 		    	});
-		   	case MageE(name,attr,_,varname):
-		   		Monad.do_m(Parser,{
-		    		string("</"+name+">");
-		    	});
 		    case _: failure("error name");
     	}
     }
@@ -244,30 +199,16 @@ class MageHtmlParser {
     	}))
     	(input);
 
-   	 public static function mageTag(input:Input)
-    	return or(Monad.do_m(Parser,{
-    		node < mageTagBegin;
-    		childNodes < nodes;
-    		tagEnd(node);
-    		mPack(addChildNodes(node,childNodes));
-    	}),Monad.do_m(Parser,{
-    		node < tagBegin;
-    		childNodes < many(or(text,mageText));
-    		many(nonchar("<"));
-    		mPack(addChildNodes(node,childNodes));
-    	}))
-    	(input);
 
     public static function addChildNodes(node,childNodes)
     	return switch(node){
     		case E(name,attr,_): E(name,attr,childNodes);
-    		case MageE(name,attr,_,varname): MageE(name,attr,childNodes,varname);
 		    case _: null;
     	}
     
 
     public static function node(input:Input)
-    	return or(commentOut,text,mageText,noEndTag,noEndMageTag,tag,mageTag)(input);
+    	return or(commentOut,text,mageText,noEndTag,tag)(input);
 
     public static function nodes(input:Input)
     	return many(node)(input);

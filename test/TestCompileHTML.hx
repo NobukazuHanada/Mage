@@ -17,7 +17,7 @@ class SimpleView{}
 package foo.bar;
 
 <div class=sample>
-  <div(content)></div>
+  <div id=content ></div>
 </div>"))
 class SimpleView2{
   var a = null;
@@ -35,8 +35,11 @@ class SimpleView2{
 @:build(mage.CompileHTML.generate("<div><p>{test}</p></div>"))
 class TextBindingView{}
 
-@:build(mage.CompileHTML.generate('<div><input(input) type=text></div>'))
+@:build(mage.CompileHTML.generate('<div><input id=input type=text></div>'))
 class InputBindingView{}
+
+@:build(mage.CompileHTML.generate('<div><SimpleView id=simpleView /></div>'))
+class ComponentDom{}
 
 class TestCompileHTML extends BuddySuite implements Buddy {
   public function new() {
@@ -81,6 +84,14 @@ class TestCompileHTML extends BuddySuite implements Buddy {
         it("new function test",{
           var func = new SimpleView2(1,2);
           func.getResult().should.be(3);
+        });
+
+        it("Component dom test",{
+          var componentDom = new ComponentDom();
+          switch(Type.typeof(componentDom.simpleView)){
+            case TClass(c) : Type.getClassName(c).should.be("SimpleView");
+            case _: Assert.fail("simple view is not class type");
+          }
         });
     });
   }

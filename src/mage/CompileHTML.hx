@@ -8,6 +8,8 @@ import simple.monads.Parser.ParseItem;
 
 using Type;
 using StringTools;
+using haxe.macro.TypeTools;
+using haxe.macro.ComplexTypeTools;
 
 class CompileHTML{
 	macro public static function generate(inputText:String):Array<Field>{
@@ -30,30 +32,40 @@ class CompileHTML{
 			return switch(node){
 				case E(name,attributes,childNodes):
 					var typeDom = elementNameToType(name);
-					var domNameExpr = macro var element : $typeDom =cast js.Browser.document.createElement($v{name});
+
+					// createDom Exprs
+					var createDomExprs = if( isUpperCaseFirstChar(name) ){
+						var newClassType = { name : name, pack : []};
+						[(macro var component : $typeDom = new $newClassType()),
+						 (macro var element = component.root)];
+					}else
+					[macro var element : $typeDom =cast js.Browser.document.createElement($v{name})];
+					
+					/// attributes expr
 					var attrExprs = attributes.map(function(attr) 
 						return macro element.setAttribute($v{attr.key},$v{attr.value}));
 					if(packageClass != null && packageClass != "")
 						attrExprs.push(macro element.classList.add($v{packageClass}));
-					var domExprs = [domNameExpr].concat(attrExprs);
+
+					// catch id doms expr
+					var catchDomExprs = [];
+					for( attr in attributes ){
+						if( attr.key == "id" ){
+							var varname = attr.value;
+							mageVars.push({name : varname, type : typeDom});
+							var expr = if( isUpperCaseFirstChar(name) )
+					 			 macro this.$varname = component
+					 		else
+					 			 macro this.$varname = element;
+					 		
+					 		catchDomExprs.push(expr);
+						}
+					}
+
+					var domExprs = createDomExprs.concat(catchDomExprs).concat(attrExprs);
 					var childrenExpr = childNodes.map(function(c) 
 					 	return macro $b{compileNode(c).map(function(c)
 					 		return if(c != null) macro element.appendChild($c)
-					 		else macro null)});
-					[macro $b{domExprs.concat(childrenExpr).concat([macro element])}];
-				case MageE(name,attributes,childNodes,varname):
-					var typeDom = elementNameToType(name);
-					var domNameExpr = macro var element : $typeDom =cast js.Browser.document.createElement($v{name});
-					var attrExprs = attributes.map(function(attr) 
-						return macro element.setAttribute($v{attr.key},$v{attr.value}));	
-					if(packageClass != null && packageClass != "")
-						attrExprs.push(macro element.classList.add($v{packageClass}));
-					 mageVars.push({name : varname, type : typeDom});
-					 var thisValueExpr = macro this.$varname = element;
-					 var domExprs = [domNameExpr,thisValueExpr].concat(attrExprs);
-					 var childrenExpr = childNodes.map(function(c) 
-					 	return macro $b{compileNode(c).map(function(c)
-					 		return if(c != null ) macro element.appendChild($c) 
 					 		else macro null)});
 					[macro $b{domExprs.concat(childrenExpr).concat([macro element])}];
 				case Text(text):
@@ -192,14 +204,19 @@ class CompileHTML{
 	private static function roottype(node:Node){
 		return switch (node) {
 			case E(name,_,_):elementNameToType(name);
-			case MageE(name,_,_,_):elementNameToType(name);
 			case _ : macro : js.html.Text;
 		};
 	}
 	#end
 
 	#if macro
-	private static function elementNameToType(s:String)
+	private static function isUpperCaseFirstChar(s : String){
+		return s.charCodeAt(0) >= "A".charCodeAt(0) && s.charCodeAt(0) <= "Z".charCodeAt(0);
+	}
+	#end
+
+	#if macro
+	private static function elementNameToType(s:String) : ComplexType
 			return switch (s) {
 				case "a": macro : js.html.AnchorElement;
 				case "applet" : macro : js.html.AppletElement;
@@ -276,7 +293,10 @@ class CompileHTML{
 				case "title" : macro : js.html.TitleElement;
 				case "track" : macro : js.html.TrackElement;
 				case "ul" : macro : js.html.UListElement;
-				case _ : macro : js.html.Element;
+				case tag : if( isUpperCaseFirstChar(tag) ){
+					   TPath({name : tag, pack : [], params : []});
+					}
+					else macro : js.html.Element;
 			};
 		#end
 }
