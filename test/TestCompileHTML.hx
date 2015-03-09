@@ -19,18 +19,7 @@ package foo.bar;
 <div class=sample>
   <div id=content ></div>
 </div>"))
-class SimpleView2{
-  var a = null;
-  var b = null;
- public function new(a,b:Int){
-  this.a = a;
-  this.b = b;
-  this.content.appendChild((new SimpleView()).root);
- }
- public function getResult(){
-  return a + b;
- }
-}
+class SimpleView2{}
 
 @:build(mage.CompileHTML.generate("<div><p>{test}</p></div>"))
 class TextBindingView{}
@@ -54,9 +43,10 @@ class TestCompileHTML extends BuddySuite implements Buddy {
 
       	it("textNode binding test",{
       		var parentDom = js.Browser.document.createElement("div");
-      		var textBindingView = new TextBindingView({test:"Hello"});
+      		var textBindingView = new TextBindingView();
       		parentDom.appendChild(textBindingView.root);
-    		parentDom.innerHTML.should.be("<div><p>Hello</p></div>");
+          textBindingView.update({ test : "Hello" });
+    		  parentDom.innerHTML.should.be("<div><p>Hello</p></div>");
 
         var test : js.html.Text = textBindingView.test;
 
@@ -65,7 +55,7 @@ class TestCompileHTML extends BuddySuite implements Buddy {
       	});
 
         it("textNode construction test",{
-          var textBindingView = new TextBindingView({});
+          var textBindingView = new TextBindingView();
           textBindingView.test.should.notNull();
 
          });
@@ -81,10 +71,6 @@ class TestCompileHTML extends BuddySuite implements Buddy {
       		input.getAttribute("type").should.be(expectedDom.getAttribute("type"));
       	});
 
-        it("new function test",{
-          var func = new SimpleView2(1,2);
-          func.getResult().should.be(3);
-        });
 
         it("Component dom test",{
           var componentDom = new ComponentDom();

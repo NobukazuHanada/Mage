@@ -75,9 +75,6 @@ class CompileHTML{
 					vars.push(varname);
 					mageVars.push({name : varname, type : textDom });
 					[macro {
-						if( initValue != null && initValue.$varname != null )
-						this.$varname = js.Browser.document.createTextNode(initValue.$varname)
-						else 
 						this.$varname = js.Browser.document.createTextNode("");
 						this.$varname;
 					}];
@@ -142,14 +139,17 @@ class CompileHTML{
 
 		fields = new_function_create(fields,nodesExpr,vars,initType);
 
+		fields = update_function_create(fields,vars);
+
 		return fields;
 	}
+
 
 	#if macro
 	private static function new_function_create(fields : Array<Field>, nodesExpr, vars, initType) : Array<Field>{
 		var new_func = null;
 		var new_expr = null;
-		var new_args = [];
+		
 
 		for( f in fields ){
 			switch (f) {
@@ -162,7 +162,6 @@ class CompileHTML{
 						})
 					}:
 					new_func = f;
-					new_args = args;
 					new_expr = expr;
 				case _: null;
 			}
@@ -184,7 +183,7 @@ class CompileHTML{
 				this.root = cast this.nodes[0];
 				$new_expr;
 			},
-			args : if(vars.length == 0 ) new_args else new_args.concat([{ name : "initValue", value : null, type : initType, opt : true }])
+			args : [],
 		}
 
 		var newfield = {
@@ -196,6 +195,29 @@ class CompileHTML{
 	      pos: Context.currentPos()
 	    };
 	    fields.push(newfield);
+		return fields;
+	}
+	#end
+
+	#if macro 
+	private static function update_function_create(fields : Array<Field>, vars : Array<String>){
+		var exprs = vars.map(function(v) return macro this.$v.nodeValue = model.$v);
+
+		var updateFunction : Function =  {
+			ret : null,
+			expr : macro $b{exprs},
+			args : [{ name : "model", value : null, type : null, opt : false }]
+		};
+
+		var updateField = {
+	      name: "update",
+	      doc: null,
+	      meta: [],
+	      access: [APublic],
+	      kind: FFun(updateFunction),
+	      pos: Context.currentPos()
+	    };
+	    fields.push(updateField);
 		return fields;
 	}
 	#end

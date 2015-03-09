@@ -18,7 +18,7 @@ div > label { color : red; }'
 	<input id="pass" type="text"><br>
 	<label for="confirm">confirm</label>
 	<input id="confirm" type="text" ><br>
-	<input( id="submit" type="submit">
+	<input id="submit" type="submit">
 </div>'
 ))
 class AccountFormView{}
@@ -44,14 +44,7 @@ class SampleView{}
 
 <div>
 	<SampleView id="sampleView" />
-	<AccountFormView id="sampleView" />
+	<AccountFormView id="accountFormView" />
 </div>'
 ))
-class NestedView{
-	public var childView : AccountFormView;
-
-	public function new(data){
-
-		this.accountForm.appendChild(this.childView.root);
-	}
-}
+class NestedView{}

@@ -4,4 +4,7 @@
 -main TestCompileHTML
 -cp src
 -cp test
--js main.js
+-js bin/main.js
+
+-cmd echo "---------- JS (PhantomJS) ----------"
+-cmd phantomjs bin/buddy.phantom.js
