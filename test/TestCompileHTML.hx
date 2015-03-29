@@ -50,7 +50,7 @@ class TestCompileHTML extends BuddySuite implements Buddy {
 
         var test : js.html.Text = textBindingView.test;
 
-    		textBindingView.test.nodeValue = "World!";
+    		textBindingView.update({ test : "World!" });
     		parentDom.innerHTML.should.be("<div><p>World!</p></div>");
       	});
 

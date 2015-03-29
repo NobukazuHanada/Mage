@@ -15,6 +15,9 @@ enum Selector{
 	SElement(e:SelectorElement);
 	SChild(parent:Selector,child:Selector);
 	SDescendant(parent:Selector,desendant:Selector);
+	SPlus(parent:Selector, desendant:Selector);
+	STilda(parent:Selector,desedant:Selector);
+	SMany(head:Selector,rest:Selector);
 }
 
 enum SelectorElement{
