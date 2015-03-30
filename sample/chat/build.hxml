@@ -2,4 +2,4 @@
 -cp ../../src
 -lib simpleMonad
 -main Main
--js exports/main.js
+-js main.js

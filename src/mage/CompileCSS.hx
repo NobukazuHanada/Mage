@@ -14,7 +14,8 @@ class CompileCSS{
 		var outputText = MageCSSPreprocessor.preprocess(inputText);
 		var outputPathArray = Compiler.getOutput().split("/");
 		outputPathArray.pop();
-		var fname =   outputPathArray.join("/") + "mage.css";
+		outputPathArray.push("mage.css");
+		var fname =   outputPathArray.join("/");
 		CompileCSS.cssCode += outputText;
 		var fout = File.write( fname, false );
 		fout.writeString(CompileCSS.cssCode);
