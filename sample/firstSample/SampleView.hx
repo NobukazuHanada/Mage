@@ -10,14 +10,14 @@ div > label { color : red; }'
 
 <div>
 	<label for="email">email</label>
-	<input(email) id="email" type="text"><br>
+	<input id="email" type="text"><br>
 	<label for="user_id">userid</label>
-	<input(userId) id="user_id" type="text"><br>
+	<input id="userId" id="user_id" type="text"><br>
 	<label for="pass">passowrd</label>
-	<input(loginForm) id="pass" type="text"><br>
+	<input id="pass" type="text"><br>
 	<label for="confirm">confirm</label>
 	<input id="confirm" type="text" mage-var="confirm"><br>
-	<input(submit) type="submit">
+	<input id="submit" type="submit">
 </div>'
 ))
 class CreateAccountFormView{}

@@ -35,6 +35,12 @@ class MageCSSPreprocessor{
             cssSelectorAddPackage(cssPackage,parent) + " " + cssSelectorAddPackage(cssPackage,descendant);
         case SChild(parent,descendant):
             cssSelectorAddPackage(cssPackage,parent) + " > " + cssSelectorAddPackage(cssPackage,descendant);
+        case SPlus(parent,descendant):
+            cssSelectorAddPackage(cssPackage,parent) + " + " + cssSelectorAddPackage(cssPackage,descendant);
+        case STilda(parent,descendant):
+            cssSelectorAddPackage(cssPackage,parent) + " ~ " + cssSelectorAddPackage(cssPackage,descendant);
+        case SMany(parent,descendant):
+            cssSelectorAddPackage(cssPackage,parent) + " , " + cssSelectorAddPackage(cssPackage,descendant);
     };
     
 }

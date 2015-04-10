@@ -51,10 +51,26 @@ class TestMageCSSPreprocessor extends BuddySuite implements Buddy {
         MageCSSPreprocessor.evalMageCSS(cssCodeData).should.be("#fuga.a-b > .foo.bar.a-b{}");
       });
 
-      it("complex selector css",{
+      it("use '>'' selector css",{
         var cssCodeData = MageCSSParser.parser("package a.b;#fuga > .foo.bar #hoge.fuga{}").mustSuccess();
         MageCSSPreprocessor.evalMageCSS(cssCodeData).should.be("#fuga.a-b > .foo.bar.a-b #hoge.fuga.a-b{}");
       });
+
+      it("use '+' selector css",{
+        var cssCodeData = MageCSSParser.parser("package a.b;#fuga + .foo.bar #hoge.fuga{}").mustSuccess();
+        MageCSSPreprocessor.evalMageCSS(cssCodeData).should.be("#fuga.a-b + .foo.bar.a-b #hoge.fuga.a-b{}");
+      });
+
+      it("use '~' selector css",{
+        var cssCodeData = MageCSSParser.parser("package a.b;#fuga ~ .foo.bar #hoge.fuga{}").mustSuccess();
+        MageCSSPreprocessor.evalMageCSS(cssCodeData).should.be("#fuga.a-b ~ .foo.bar.a-b #hoge.fuga.a-b{}");
+      });
+
+      it("use ',' selector css",{
+        var cssCodeData = MageCSSParser.parser("package a.b;#fuga, .foo.bar #hoge.fuga{}").mustSuccess();
+        MageCSSPreprocessor.evalMageCSS(cssCodeData).should.be("#fuga.a-b , .foo.bar.a-b #hoge.fuga.a-b{}");
+      });
+
 
       it("make new css code",{
           var cssCodeData = MageCSSParser.parser(

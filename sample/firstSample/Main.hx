@@ -10,10 +10,14 @@ class Main{
 			var base = new BaseView();
 			js.Browser.document.body.appendChild(base.root);
 
-			var sampleView = new SampleView({message:"hello!", name:"@nobkz"});
+			var sampleView = new SampleView();
+			sampleView.update({message:"Hello", name:"@nobkz"});
 			base.root.appendChild(sampleView.root);
 
 			var accountView = new CreateAccountFormView();
+			accountView.submit.addEventListener("click",function(e){
+				trace("hello");
+			});
 			base.root.appendChild(accountView.root);
 		});
 	}
