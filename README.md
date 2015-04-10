@@ -4,7 +4,6 @@ Mage
 Haxe MVW Frontend Framework
 
 ## Install
-
 install this command
 
 ```
