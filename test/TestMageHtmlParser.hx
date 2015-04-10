@@ -156,25 +156,8 @@ class TestMageHtmlParser extends BuddySuite implements Buddy{
     			}
     		});
 
-    		it("simple mage no end tag",{
-    			var result = MageHtmlParser.parse("<input(hoge) attr=sample>");
-    			   switch(result){
-    				case Success(ParseItem(e,_)): 
-    					e.string().should.be(
-    						[MageE("input",[{key:"attr",value:"sample"}],[],"hoge")].string());
-    				case _: fail("Parser Error");
-    			}
-    		});
 
-    		it("simple mage tag",{
-    			var result = MageHtmlParser.parse("<div(hoge) attr=sample></div>");
-    			   switch(result){
-    				case Success(ParseItem(e,_)): 
-    					e.string().should.be(
-    						[MageE("div",[{key:"attr",value:"sample"}],[],"hoge")].string());
-    				case _: fail("Parser Error");
-    			}
-    		});
+
 
             it("no end tag attrs",{
                 var result = MageHtmlParser.parse('<input type="text" />');
@@ -185,15 +168,7 @@ class TestMageHtmlParser extends BuddySuite implements Buddy{
                     case _: fail("Parser Error");
                 }
             });
-            it("no end mage tag attrs",{
-                var result = MageHtmlParser.parse('<input(input) type="text" />');
-                   switch(result){
-                    case Success(ParseItem(e,_)): 
-                        e.string().should.be(
-                            [MageE("input",[{key:"type",value:"text"}],[],"input")].string());
-                    case _: fail("Parser Error");
-                }
-            });
+
 
             it("element attribute non value pattern",{
                 var text = '<textarea name="" id cols="30" rows="10" ></textarea>';
@@ -210,20 +185,6 @@ class TestMageHtmlParser extends BuddySuite implements Buddy{
                 }
             });
 
-             it("mage element attribute non value pattern",{
-                var text = '<textarea(comment) name="" id cols="30" rows="10" ></textarea>';
-                var result = MageHtmlParser.parse(text);
-                switch(result){
-                    case Success(ParseItem(e,_)): 
-                        e.string().should.be(
-                            [MageE("textarea",[
-                                {key:"name",value:""},
-                                {key:"id",value:""},
-                                {key:"cols",value:"30"},
-                                {key:"rows",value:"10"}],[],"comment")].string());
-                    case _: fail("Parser Error");
-                }
-            });
 
             it("mage href attrbuite",{
                 var result = MageHtmlParser.parse('<a href="/">');
@@ -243,17 +204,6 @@ class TestMageHtmlParser extends BuddySuite implements Buddy{
                     case Success(ParseItem(e,_)): 
                         e.string().should.be(
                             [E("svg",[],[E("rect",[],[]),E("path",[],[])])].string());
-                    case _: fail("Parser Error");
-                }
-            });
-            it("mage svg tags",{
-                var text =
-                '<svg><rect(rect) /><path(path) /></svg>';
-                var result = MageHtmlParser.parse(text);
-                switch(result){
-                    case Success(ParseItem(e,_)): 
-                        e.string().should.be(
-                            [E("svg",[],[MageE("rect",[],[],"rect"),MageE("path",[],[],"path")])].string());
                     case _: fail("Parser Error");
                 }
             });

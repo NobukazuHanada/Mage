@@ -10,14 +10,15 @@ div > label { color : red; }'
 
 <div>
 	<label for="email">email</label>
-	<input(email) id="email" type="text"><br>
+	<input id="email" type="text"><br>
+	<p>{warning}</p>
 	<label for="user_id">userid</label>
-	<input(userId) id="user_id" type="text"><br>
+	<input id="user_id" type="text"><br>
 	<label for="pass">passowrd</label>
-	<input(loginForm) id="pass" type="text"><br>
+	<input id="pass" type="text"><br>
 	<label for="confirm">confirm</label>
-	<input id="confirm" type="text" mage-var="confirm"><br>
-	<input(submit) type="submit">
+	<input id="confirm" type="text" ><br>
+	<input id="submit" type="submit">
 </div>'
 ))
 class AccountFormView{}
@@ -42,13 +43,8 @@ class SampleView{}
 'package sample.base;
 
 <div>
-	<div(sampleView)></div>
-	<div(accountForm)></div>
+	<SampleView id="sampleView" />
+	<AccountFormView id="accountFormView" />
 </div>'
 ))
-class NestedView{
-	public function new(data){
-		this.sampleView.appendChild((new SampleView(data)).root);
-		this.accountForm.appendChild((new AccountFormView()).root);
-	}
-}
+class NestedView{}

@@ -166,6 +166,30 @@ class MageCSSParser{
                 mPack(SChild(SElement(selem),srest));
             })
             ,Monad.do_m(Parser,{
+                selem < selement;
+                spaces;
+                char("+");
+                spaces;
+                srest < selector;
+                mPack(SPlus(SElement(selem),srest));
+            })
+            ,Monad.do_m(Parser,{
+                selem < selement;
+                spaces;
+                char("~");
+                spaces;
+                srest < selector;
+                mPack(STilda(SElement(selem),srest));
+            })
+            ,Monad.do_m(Parser,{
+                selem < selement;
+                spaces;
+                char(",");
+                spaces;
+                srest < selector;
+                mPack(SMany(SElement(selem),srest));
+            })
+            ,Monad.do_m(Parser,{
                 elem < selement;
                 mPack(SElement(elem));
             }))(input);
