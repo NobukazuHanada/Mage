@@ -7,9 +7,9 @@
   "tags": ["web", "js"],
   "description":
       "Frontend Library on Haxe",
-  "version": "0.3.5",
+  "version": "0.3.6",
   "releasenote":
-      "add root node fields",
+      "fixed test",
   "contributors": ["nobkz"],
   "dependencies": {
     "simpleMonad" : ""
