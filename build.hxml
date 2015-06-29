@@ -1,7 +1,7 @@
 -lib buddy
 -lib simpleMonad
 -lib utest
--main TestCompileHTML
+-main Main
 -cp src
 -cp test
 -js bin/main.js

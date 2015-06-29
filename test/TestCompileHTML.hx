@@ -30,7 +30,8 @@ class InputBindingView{}
 @:build(mage.CompileHTML.generate('<div><SimpleView id=simpleView /></div>'))
 class ComponentDom{}
 
-class TestCompileHTML extends BuddySuite implements Buddy {
+
+class TestCompileHTML extends BuddySuite{
   public function new() {
     describe("Test Compile HTML", {
 
